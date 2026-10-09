@@ -1,0 +1,189 @@
+/**
+ * Siatka zasobów (pokarm) i generator mapy żyzności.
+ * Żyzność jest deterministyczna względem seeda; pojemność komórki = foodCapMax · żyzność.
+ */
+import type { WorldSetup } from './config';
+import { cosSmall, sinSmall } from './mathx';
+import type { Rng } from './rng';
+
+export class ResourceGrid {
+  readonly nx: number;
+  readonly ny: number;
+  food: Float64Array;
+  fert: Float32Array;
+
+  constructor(
+    width: number,
+    height: number,
+    readonly cell: number,
+  ) {
+    this.nx = Math.max(1, Math.ceil(width / cell));
+    this.ny = Math.max(1, Math.ceil(height / cell));
+    this.food = new Float64Array(this.nx * this.ny);
+    this.fert = new Float32Array(this.nx * this.ny);
+  }
+
+  get cells(): number {
+    return this.nx * this.ny;
+  }
+}
+
+/** Żyzna plama (wzorzec `patches`): kernel (1 − d²/r²)², amplituda, kierunek dryfu i cykl życia. */
+export interface Patch {
+  x: number;
+  y: number;
+  r: number;
+  a: number;
+  /** jednostkowy kierunek dryfu */
+  dx: number;
+  dy: number;
+  age: number;
+  /** długość cyklu życia w tickach; 0 = trwała (amplituda stała) */
+  life: number;
+}
+
+const PATCH_BASE = 0.04;
+
+export function patchScale(setup: WorldSetup): number {
+  return Math.min(setup.width, setup.height) / 800;
+}
+
+function patchAmplitude(p: Patch): number {
+  if (p.life <= 0) return 1;
+  const ramp = 0.2 * p.life;
+  const f = Math.min(p.age / ramp, (p.life - p.age) / ramp, 1);
+  return f < 0 ? 0 : f;
+}
+
+/** Przelicza mapę żyzności z listy plam. Tylko arytmetyka — przenośne. */
+export function renderPatches(setup: WorldSetup, grid: ResourceGrid, patches: Patch[]): void {
+  const { nx, ny, cell } = grid;
+  const f = grid.fert;
+  const amp = patches.map(patchAmplitude);
+  for (let gy = 0; gy < ny; gy++)
+    for (let gx = 0; gx < nx; gx++) {
+      const cx = (gx + 0.5) * cell;
+      const cy = (gy + 0.5) * cell;
+      let v = PATCH_BASE;
+      for (let p = 0; p < patches.length; p++) {
+        const dx = cx - patches[p].x;
+        const dy = cy - patches[p].y;
+        const u = (dx * dx + dy * dy) / (patches[p].r * patches[p].r);
+        if (u < 1) v += patches[p].a * amp[p] * (1 - u) * (1 - u);
+      }
+      f[gy * nx + gx] = Math.min(1, v);
+    }
+  void setup;
+}
+
+/**
+ * Wypełnia mapę żyzności [0,1]. Dla wzorca `patches` zwraca listę plam (można je potem przesuwać
+ * i odnawiać); dla pozostałych wzorców mapa jest statyczna i lista jest pusta.
+ */
+export function generateFertility(setup: WorldSetup, grid: ResourceGrid, rng: Rng): Patch[] {
+  const { nx, ny, cell } = grid;
+  const W = setup.width;
+  const H = setup.height;
+  const f = grid.fert;
+  switch (setup.fertilityPattern) {
+    case 'uniform':
+      f.fill(0.5);
+      return [];
+    case 'gradient':
+      for (let gy = 0; gy < ny; gy++)
+        for (let gx = 0; gx < nx; gx++) f[gy * nx + gx] = 0.04 + 0.96 * (((gx + 0.5) * cell) / W);
+      return [];
+    case 'oasis': {
+      const R = 0.5 * Math.min(W, H);
+      for (let gy = 0; gy < ny; gy++)
+        for (let gx = 0; gx < nx; gx++) {
+          const dx = (gx + 0.5) * cell - W / 2;
+          const dy = (gy + 0.5) * cell - H / 2;
+          const u = Math.sqrt(dx * dx + dy * dy) / R;
+          const k = u < 1 ? (1 - u) * (1 - u) : 0;
+          f[gy * nx + gx] = Math.min(1, 0.03 + k);
+        }
+      return [];
+    }
+    case 'patches':
+    default: {
+      const patches: Patch[] = [];
+      const scale = patchScale(setup);
+      for (let p = 0; p < setup.patchCount; p++) {
+        const x = rng.float() * W;
+        const y = rng.float() * H;
+        const r = rng.range(70, 170) * scale;
+        const a = rng.range(0.6, 1.0);
+        const h = randomUnit(rng);
+        patches.push({ x, y, r, a, dx: h[0], dy: h[1], age: 0, life: 0 });
+      }
+      renderPatches(setup, grid, patches);
+      return patches;
+    }
+  }
+}
+
+export function randomUnit(rng: Rng): [number, number] {
+  let x: number, y: number, d: number;
+  do {
+    x = rng.float() * 2 - 1;
+    y = rng.float() * 2 - 1;
+    d = x * x + y * y;
+  } while (d > 1 || d < 1e-6);
+  const inv = 1 / Math.sqrt(d);
+  return [x * inv, y * inv];
+}
+
+/**
+ * Jeden tick dynamiki plam: dryf (losowe błądzenie kierunku, odbicie od ścian) oraz cykl życia
+ * (plama rośnie, wygasa i odradza się w losowym miejscu). Zwraca `true`, gdy zmieniły się dane plam.
+ */
+export function stepPatches(patches: Patch[], setup: WorldSetup, drift: number, lifeParam: number, rng: Rng): boolean {
+  if (drift <= 0 && lifeParam <= 0) return false;
+  const W = setup.width;
+  const H = setup.height;
+  const scale = patchScale(setup);
+  for (const p of patches) {
+    if (drift > 0) {
+      const th = rng.gauss() * 0.06;
+      const c = cosSmall(th);
+      const s = sinSmall(th);
+      let ndx = p.dx * c - p.dy * s;
+      let ndy = p.dx * s + p.dy * c;
+      const inv = 1 / Math.sqrt(ndx * ndx + ndy * ndy);
+      ndx *= inv;
+      ndy *= inv;
+      p.dx = ndx;
+      p.dy = ndy;
+      p.x += ndx * drift;
+      p.y += ndy * drift;
+      if (p.x < 0) { p.x = -p.x; p.dx = Math.abs(p.dx); } else if (p.x > W) { p.x = 2 * W - p.x; p.dx = -Math.abs(p.dx); }
+      if (p.y < 0) { p.y = -p.y; p.dy = Math.abs(p.dy); } else if (p.y > H) { p.y = 2 * H - p.y; p.dy = -Math.abs(p.dy); }
+    }
+    if (lifeParam > 0) {
+      if (p.life <= 0) assignPhase(p, lifeParam, rng);
+      p.age++;
+      if (p.age >= p.life) {
+        p.x = rng.float() * W;
+        p.y = rng.float() * H;
+        p.r = rng.range(70, 170) * scale;
+        p.a = rng.range(0.6, 1.0);
+        const h = randomUnit(rng);
+        p.dx = h[0];
+        p.dy = h[1];
+        p.age = 0;
+        p.life = lifeParam * (0.6 + 0.8 * rng.float());
+      }
+    } else if (p.life > 0) {
+      p.life = 0;
+      p.age = 0;
+    }
+  }
+  return true;
+}
+
+/** Losowa faza cyklu życia plamy (żeby plamy nie wygasały jednocześnie). */
+export function assignPhase(p: Patch, lifeParam: number, rng: Rng): void {
+  p.life = lifeParam * (0.6 + 0.8 * rng.float());
+  p.age = Math.floor(rng.float() * p.life);
+}
