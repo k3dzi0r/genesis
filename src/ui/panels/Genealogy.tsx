@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { TRAIT_LABELS, TRAIT_NAMES, W1_OFF, N_IN, N_HID, INPUT_LABELS, OUTPUT_LABELS, B1_OFF, B2_OFF, W2_OFF } from '../../engine/constants';
 import type { CompareResult, LineageResult, LineageTreeNode } from '../../worker/protocol';
 import type { WorldClient } from '../client';
+import { Help } from '../help/Help';
 import { fmt, useInterval, useManager } from '../hooks';
 import { GenomeStrip } from './Brain';
 import { TRAIT_COLORS } from './Stats';
@@ -182,11 +183,17 @@ export function Genealogy({ client }: { client: WorldClient }) {
     <div className="panel-body">
       <section className="card">
         <header>
-          <h4>Rodowód #{id}</h4>
+          <h4>
+            Rodowód #{id}
+            <Help id="lineage" />
+          </h4>
           <span className="hint">pokolenie {self.generation}</span>
         </header>
         <div className="kv">
-          <span>Przodków do założyciela</span>
+          <span>
+            Przodków do założyciela
+            <Help id="generation" />
+          </span>
           <b>{anc.length - 1}</b>
           <span>Założyciel</span>
           <b>
@@ -215,7 +222,10 @@ export function Genealogy({ client }: { client: WorldClient }) {
 
       <section className="card">
         <header>
-          <h4>Drzewo</h4>
+          <h4>
+            Drzewo
+            <Help id="tree.legend" />
+          </h4>
           <span className="hint">
             ● żywy · ● zmarły · rozmiar ~ potomstwo{mine.descendantsTruncated ? ' · potomkowie skrócone' : ''}
           </span>
@@ -225,7 +235,10 @@ export function Genealogy({ client }: { client: WorldClient }) {
 
       <section className="card">
         <header>
-          <h4>Cechy wzdłuż linii przodków</h4>
+          <h4>
+            Cechy wzdłuż linii przodków
+            <Help id="tree.sparks" />
+          </h4>
           <span className="hint">od założyciela (lewo) do wybranego organizmu (prawo)</span>
         </header>
         <div className="sparks">
@@ -237,7 +250,10 @@ export function Genealogy({ client }: { client: WorldClient }) {
 
       <section className="card">
         <header>
-          <h4>Porównanie z przodkiem</h4>
+          <h4>
+            Porównanie z przodkiem
+            <Help id="tree.compare" />
+          </h4>
           <span className="hint">genomy odtwarzane z rejestru mutacji</span>
         </header>
         <label className="slider-row">

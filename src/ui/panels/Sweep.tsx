@@ -5,6 +5,7 @@ import { ci95, welchTest } from '../../engine/statsutil';
 import { downloadBytes } from '../../storage/db';
 import type { FromSeries, ToSeries } from '../../worker/protocol';
 import { manager, type WorldClient } from '../client';
+import { Help } from '../help/Help';
 import { fmt } from '../hooks';
 
 interface ParamOption {
@@ -170,7 +171,10 @@ export function SweepRunner({ client }: { client: WorldClient }) {
   return (
     <section className="card">
       <header>
-        <h4>Przeszukiwanie parametrów</h4>
+        <h4>
+          Przeszukiwanie parametrów
+          <Help id="paramsweep" />
+        </h4>
         <span className="hint">siatka × seedy, headless w osobnym wątku</span>
       </header>
       <div className="form-grid">
@@ -253,6 +257,11 @@ export function SweepRunner({ client }: { client: WorldClient }) {
       {sw.result && <Heatmap r={sw.result} metric={metric} />}
       {sw.result && (
         <p className="note">
+          Jak czytać mapę cieplną? <Help id="heatmap" />
+        </p>
+      )}
+      {sw.result && (
+        <p className="note">
           Komórka = średnia metryki po seedach (najechanie pokazuje 95% przedział ufności i wymarcia ✝). Wnioski o wpływie parametru warto potwierdzić testem A/B poniżej.
         </p>
       )}
@@ -303,15 +312,24 @@ export function AbTest({ client }: { client: WorldClient }) {
         <b>
           {cb.mean.toFixed(3)} <small>[{cb.lo.toFixed(3)}; {cb.hi.toFixed(3)}]</small>
         </b>
-        <span>Różnica B − A (95% CI)</span>
+        <span>
+          Różnica B − A (95% CI)
+          <Help id="ci95" />
+        </span>
         <b>
           {t.diff.toFixed(3)} <small>[{t.ciLo.toFixed(3)}; {t.ciHi.toFixed(3)}]</small>
         </b>
-        <span>Test Welcha</span>
+        <span>
+          Test Welcha
+          <Help id="welch" />
+        </span>
         <b>
           t = {t.t.toFixed(2)}, df = {t.df.toFixed(1)}
         </b>
-        <span>Wartość p (dwustronna)</span>
+        <span>
+          Wartość p (dwustronna)
+          <Help id="pvalue" />
+        </span>
         <b className={sig ? 'ok' : ''}>{t.p < 0.0001 ? '< 0,0001' : t.p.toFixed(4)}</b>
         <span>Wymarcia A / B</span>
         <b>
@@ -324,7 +342,10 @@ export function AbTest({ client }: { client: WorldClient }) {
   return (
     <section className="card">
       <header>
-        <h4>Test A/B dwóch ustawień</h4>
+        <h4>
+          Test A/B dwóch ustawień
+          <Help id="ab" />
+        </h4>
         <span className="hint">ta sama pula seedów, test t Welcha</span>
       </header>
       <div className="form-grid">

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { PARAM_META, type EventKind, type ParamMeta, type WorldParams } from '../../engine/config';
 import type { WorldClient } from '../client';
+import { Help } from '../help/Help';
 import { fmt, useManager } from '../hooks';
 
 function fmtParam(v: number): string {
@@ -21,7 +22,10 @@ function ParamSlider({ client, k, meta, value }: { client: WorldClient; k: keyof
   return (
     <label className="slider-row" title={meta.hint}>
       <span>
-        {meta.label}
+        <span className="lbl">
+          {meta.label}
+          <Help id={`param.${k}`} />
+        </span>
         <b>{fmtParam(v)}</b>
       </span>
       <input
@@ -40,6 +44,8 @@ function ParamSlider({ client, k, meta, value }: { client: WorldClient; k: keyof
     </label>
   );
 }
+
+const EVENT_HELP: Record<EventKind, string> = { drought: 'event.drought', bloom: 'event.bloom', coldSnap: 'event.cold', cull: 'event.cull', blight: 'event.blight' };
 
 const EVENTS: { kind: EventKind; label: string; hint: string; timed: boolean }[] = [
   { kind: 'drought', label: 'Susza', hint: 'Spowalnia odnawianie zasobów', timed: true },
@@ -66,26 +72,40 @@ export function Controls({ client }: { client: WorldClient }) {
     <div className="panel-body">
       <section className="card">
         <header>
-          <h4>Zdarzenia środowiskowe</h4>
+          <h4>
+            Zdarzenia środowiskowe
+            <Help id="events" />
+          </h4>
           <span className="hint">interwencje są zapisywane w dzienniku eksperymentu</span>
         </header>
         <label className="slider-row">
           <span>
-            Siła<b>{sev.toFixed(2)}</b>
+            <span className="lbl">
+              Siła
+              <Help id="event.severity" />
+            </span>
+            <b>{sev.toFixed(2)}</b>
           </span>
           <input type="range" min={0.05} max={1} step={0.05} value={sev} onChange={(e) => setSev(Number(e.target.value))} />
         </label>
         <label className="slider-row">
           <span>
-            Czas trwania<b>{fmt.int(dur)} t.</b>
+            <span className="lbl">
+              Czas trwania
+              <Help id="event.duration" />
+            </span>
+            <b>{fmt.int(dur)} t.</b>
           </span>
           <input type="range" min={100} max={10000} step={100} value={dur} onChange={(e) => setDur(Number(e.target.value))} />
         </label>
         <div className="btn-grid">
           {EVENTS.map((e) => (
-            <button key={e.kind} className={`btn ev-${e.kind}`} title={e.hint} onClick={() => client.command({ type: 'event', spec: { kind: e.kind, severity: sev, duration: e.timed ? dur : undefined } })}>
-              {e.label}
-            </button>
+            <div key={e.kind} className="btn-help">
+              <button className={`btn ev-${e.kind}`} title={e.hint} onClick={() => client.command({ type: 'event', spec: { kind: e.kind, severity: sev, duration: e.timed ? dur : undefined } })}>
+                {e.label}
+              </button>
+              <Help id={EVENT_HELP[e.kind]} />
+            </div>
           ))}
         </div>
         {info && info.activeEvents.length > 0 && (
@@ -98,16 +118,25 @@ export function Controls({ client }: { client: WorldClient }) {
           </div>
         )}
         <div className="kv">
-          <span>Temperatura</span>
+          <span>
+            Temperatura
+            <Help id="temperature" />
+          </span>
           <b>{fmt.f2(info?.temperature ?? 1)}</b>
-          <span>Mnożnik odnawiania</span>
+          <span>
+            Mnożnik odnawiania
+            <Help id="logistic" />
+          </span>
           <b>×{fmt.f2(info?.growthMult ?? 1)}</b>
         </div>
       </section>
 
       <section className="card">
         <header>
-          <h4>Dosyp zasoby</h4>
+          <h4>
+            Dosyp zasoby
+            <Help id="addfood" />
+          </h4>
           <span className="hint">wpływ energii spoza modelu — księgowany osobno</span>
         </header>
         <label className="slider-row">
@@ -124,7 +153,10 @@ export function Controls({ client }: { client: WorldClient }) {
       {[...groups.entries()].map(([g, items]) => (
         <section className="card collapsible" key={g}>
           <header onClick={() => setOpen({ ...open, [g]: !open[g] })}>
-            <h4>{g}</h4>
+            <h4>
+              {g}
+              <Help id={`group.${g}`} />
+            </h4>
             <span className="hint">{open[g] ? '▾' : '▸'}</span>
           </header>
           {open[g] && info && items.map(([k, m]) => <ParamSlider key={k} client={client} k={k} meta={m} value={info.params[k]} />)}

@@ -18,6 +18,20 @@
 * Każdy świat to osobny Worker → wiele światów działa równolegle na różnych rdzeniach (porównania A/B, bliźniaki, rozwidlenia).
 * Seria seedów działa w osobnym workerze (`series.worker.ts`) w trybie headless.
 
+## Warstwa edukacyjna (`src/ui/help`)
+
+| Plik | Zawartość |
+|---|---|
+| `types.ts` | typy wpisu (`HelpEntry`), działy słownika, lekcji (`Lesson`) |
+| `concepts.ts`, `params.ts`, `analysis.ts`, `interface.ts` | treści: pojęcia, parametry i geny, statystyka i narzędzia, elementy interfejsu |
+| `lessons.ts` | lekcje; pole `observed` zawiera wyłącznie zmierzone wyniki |
+| `content.ts` | scala wpisy, udostępnia słownik i ciekawostki |
+| `store.ts` | stan jednego globalnego dymka i magistrala poleceń interfejsu (`uiBus`) |
+| `Help.tsx` | przycisk `<Help id="…" />` i jedna instancja dymka (hover = skrót, klik = przypięcie) |
+| `Welcome.tsx` | ekran powitalny (flaga w localStorage, z obsługą jego braku) |
+
+Panel zakładki „Nauka” to `src/ui/panels/Learn.tsx`. Treści nie zależą od silnika poza nazwami parametrów, a test `tests/help.test.ts` sprawdza zgodność z `PARAM_META`, `TRAIT_NAMES` i konfiguracją.
+
 ## Silnik (`src/engine`)
 
 | Plik | Odpowiedzialność |

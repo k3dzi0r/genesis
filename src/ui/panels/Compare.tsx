@@ -4,6 +4,7 @@ import { TRAIT_LABELS } from '../../engine/constants';
 import { STAT_COLUMNS } from '../../engine/stats';
 import { manager } from '../client';
 import { LineChart, Legend, type ChartSeries } from '../charts';
+import { Help } from '../help/Help';
 import { fmt, useManager } from '../hooks';
 
 const PALETTE = ['#3de0c5', '#ffb454', '#6aa8ff', '#ff6b7a', '#ba68c8', '#7be08a', '#f06292', '#ffd54f'];
@@ -46,7 +47,10 @@ export function ComparePanel() {
     <div className="panel-body">
       <section className="card">
         <header>
-          <h4>Porównanie światów</h4>
+          <h4>
+            Porównanie światów
+            <Help id="compare" />
+          </h4>
           <span className="hint">{worlds.length} {worlds.length === 1 ? 'świat' : 'światy'}</span>
         </header>
         {worlds.length < 2 && <p className="note">Utwórz bliźniaka (zakładka Eksperyment → „Bliźniak od startu”) albo rozwidl świat, a następnie zmień warunki tylko w jednym z nich — wykresy pokażą rozbieżność.</p>}

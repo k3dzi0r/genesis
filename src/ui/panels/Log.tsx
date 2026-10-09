@@ -1,4 +1,5 @@
 import type { WorldClient } from '../client';
+import { Help } from '../help/Help';
 import { fmt, useManager } from '../hooks';
 
 const KIND_TONE: Record<string, string> = {
@@ -21,7 +22,10 @@ export function LogPanel({ client }: { client: WorldClient }) {
     <div className="panel-body">
       <section className="card">
         <header>
-          <h4>Dziennik zdarzeń</h4>
+          <h4>
+            Dziennik zdarzeń
+            <Help id="log" />
+          </h4>
           <span className="hint">{info.eventLogTotal} wpisów</span>
         </header>
         <div className="log">
@@ -35,7 +39,10 @@ export function LogPanel({ client }: { client: WorldClient }) {
       </section>
       <section className="card">
         <header>
-          <h4>Historia parametrów</h4>
+          <h4>
+            Historia parametrów
+            <Help id="commandlog" />
+          </h4>
           <span className="hint">zmiany w trakcie eksperymentu</span>
         </header>
         {info.paramHistory.length === 0 && <div className="chart-empty">Parametry nie były zmieniane.</div>}

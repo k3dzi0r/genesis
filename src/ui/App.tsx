@@ -1,8 +1,14 @@
 import { useEffect, useState } from 'react';
+import type { WorldParams, WorldSetup } from '../engine/config';
 import { ENGINE_VERSION } from '../engine/constants';
 import { getSaveBytes, listSaves, type SaveMeta } from '../storage/db';
 import { manager, type WorldClient } from './client';
 import { fmt, useManager } from './hooks';
+import { HelpPopover, Help } from './help/Help';
+import { uiBus } from './help/store';
+import type { Lesson } from './help/types';
+import { Welcome, shouldShowWelcome } from './help/Welcome';
+import { LearnPanel, type LearnTab } from './panels/Learn';
 import { WorldView } from './WorldView';
 import { Controls } from './panels/Controls';
 import { ComparePanel } from './panels/Compare';
@@ -13,7 +19,7 @@ import { LogPanel } from './panels/Log';
 import { StatsPanel } from './panels/Stats';
 
 type LeftTab = 'env' | 'exp' | 'saves';
-type RightTab = 'stats' | 'org' | 'gen' | 'cmp' | 'log';
+type RightTab = 'stats' | 'org' | 'gen' | 'cmp' | 'log' | 'learn';
 
 const SPEEDS: { label: string; tps: number }[] = [
   { label: '1×', tps: 30 },
@@ -51,6 +57,7 @@ function Toolbar({ client }: { client: WorldClient }) {
       <button className={`btn play ${playing ? 'on' : ''}`} disabled={extinct} onClick={() => client.play(!playing)} title="Start / pauza (spacja)">
         {playing ? '❚❚ Pauza' : '▶ Start'}
       </button>
+      <Help id="play" className="tb-help" />
       <button className="btn" disabled={extinct} onClick={() => client.step(1)} title="Jeden tick (.)">
         ⏭ Krok
       </button>
@@ -64,13 +71,16 @@ function Toolbar({ client }: { client: WorldClient }) {
           </button>
         ))}
       </div>
+      <Help id="speed" className="tb-help" />
       <div className="readout">
         <span>tick</span>
         <b>{fmt.int(info?.tick ?? 0)}</b>
+        <Help id="tick" />
       </div>
       <div className="readout">
         <span>pop.</span>
         <b>{fmt.int(info?.pop ?? 0)}</b>
+        <Help id="kpi.pop" />
       </div>
       <div className="readout dim">
         <span>t/s</span>
@@ -96,6 +106,53 @@ export function App() {
   const [leftOpen, setLeftOpen] = useState(wide);
   const [rightOpen, setRightOpen] = useState(wide);
   const [resume, setResume] = useState<SaveMeta | null>(null);
+  const [welcome, setWelcome] = useState(() => shouldShowWelcome());
+  const [learnTab, setLearnTab] = useState<LearnTab>('start');
+  const [glossaryFocus, setGlossaryFocus] = useState<string | null>(null);
+  const [lessonFocus, setLessonFocus] = useState<string | null>(null);
+
+  const runLesson = (l: Lesson) => {
+    const a = l.action;
+    let last: ReturnType<typeof manager.create> | null = null;
+    for (const w of a.worlds) {
+      last = manager.create((w.setup ?? {}) as Partial<WorldSetup>, (w.params ?? {}) as Partial<WorldParams>, w.name);
+      if (a.speed) last.setSpeed(a.speed.tps, a.speed.label);
+    }
+    if (a.openLeft) {
+      setLeftOpen(true);
+      setLeft(a.openLeft);
+    }
+    if (a.openTab) {
+      setRightOpen(true);
+      setRight(a.openTab);
+    }
+    void last;
+  };
+
+  useEffect(() => {
+    uiBus.set((r) => {
+      if (r.type === 'glossary') {
+        setRightOpen(true);
+        setRight('learn');
+        setLearnTab('glossary');
+        setGlossaryFocus(r.id ?? null);
+      } else if (r.type === 'learn') {
+        setRightOpen(true);
+        setRight('learn');
+        setLearnTab(r.tab);
+        if (r.lessonId) setLessonFocus(r.lessonId);
+      } else if (r.type === 'tab') {
+        if (r.side === 'right') {
+          setRightOpen(true);
+          setRight(r.tab as RightTab);
+        } else {
+          setLeftOpen(true);
+          setLeft(r.tab as LeftTab);
+        }
+      } else if (r.type === 'welcome') setWelcome(true);
+    });
+    return () => uiBus.set(null);
+  }, []);
 
   useEffect(() => {
     if (booted) return;
@@ -128,6 +185,7 @@ export function App() {
         const s = SPEEDS[Number(e.key) - 1];
         a.setSpeed(s.tps, s.label);
       } else if (e.key === 'Escape') a.select(null);
+      else if (e.key === '?') uiBus.send({ type: 'learn', tab: 'start' });
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -170,6 +228,9 @@ export function App() {
             +
           </button>
         </nav>
+        <button className="learn-btn" onClick={() => uiBus.send({ type: 'learn', tab: 'start' })} title="Nauka: przewodnik, lekcje, słownik (klawisz ?)">
+          <span>?</span> Nauka
+        </button>
         <button className="icon-btn" onClick={() => setRightOpen(!rightOpen)} title="Panel analityczny">
           ◧
         </button>
@@ -225,14 +286,27 @@ export function App() {
           {rt('gen', 'Genealogia')}
           {rt('cmp', 'Porównanie')}
           {rt('log', 'Dziennik')}
+          {rt('learn', 'Nauka')}
         </div>
         {active && right === 'stats' && <StatsPanel client={active} />}
         {active && right === 'org' && <Inspector client={active} goGenealogy={() => setRight('gen')} />}
         {active && right === 'gen' && <Genealogy client={active} />}
         {right === 'cmp' && <ComparePanel />}
         {active && right === 'log' && <LogPanel client={active} />}
+        {right === 'learn' && <LearnPanel tab={learnTab} onTab={setLearnTab} focus={glossaryFocus} lessonFocus={lessonFocus} onRunLesson={runLesson} />}
       </aside>
 
+      <HelpPopover />
+      {welcome && (
+        <Welcome
+          onClose={() => setWelcome(false)}
+          onLessons={() => {
+            setRightOpen(true);
+            setRight('learn');
+            setLearnTab('lessons');
+          }}
+        />
+      )}
       <div className="toasts">
         {m.toasts.map((t) => (
           <div key={t.id} className="toast">

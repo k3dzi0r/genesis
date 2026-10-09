@@ -1,0 +1,310 @@
+import type { Lesson } from './types';
+
+/**
+ * Lekcje: gotowe eksperymenty. Pole `observed` zawiera WYŁĄCZNIE to, co zmierzono w testach autora
+ * (skrypty headless, domyślny świat 800×800, wersja silnika 0.3.0); nic tu nie jest zgadywane.
+ * Jeśli czegoś nie mierzono, pola `observed` nie ma — a w `caveat` jest o tym mowa.
+ */
+const MAX = { label: 'MAX', tps: 1e9 };
+
+export const LESSONS: Lesson[] = [
+  {
+    id: 'first',
+    title: 'Pierwszy świat: co tu się dzieje?',
+    level: 'start',
+    minutes: 5,
+    goal: 'Poznasz planszę, kartę organizmu i symbol „?” — i zobaczysz pierwsze drapieżniki.',
+    intro: ['Uruchomimy domyślny świat w spokojnym tempie (10×) i przejdziemy po najważniejszych elementach. Na razie niczego nie zmieniamy — tylko patrzymy.'],
+    steps: [
+      'Poczekaj kilkanaście sekund, aż pojawią się pierwsze urodziny (tempo 10× = 300 ticków na sekundę).',
+      'Kliknij największą kropkę na planszy. Po prawej otworzy się karta organizmu.',
+      'Najedź na „?” przy „Energia”, „Geny → fizjologia” i „Sieć neuronowa”. Kliknij jedno z nich, by przypiąć dymek.',
+      'Zmień „Kolor” (prawy górny róg planszy) na „Dieta”. Czerwone kropki to drapieżniki.',
+      'Otwórz zakładkę Statystyki i zobacz wykres „Populacja i demografia”.',
+    ],
+    lookFor: [
+      'Zielone plamy pokarmu kurczą się tam, gdzie gromadzą się organizmy.',
+      'Duże organizmy częściej stoją na plamach niż małe.',
+      'Zaznaczony organizm ma wokół siebie kółko zasięgu zmysłów i zostawia ślad.',
+    ],
+    observed: ['W domyślnym świecie drapieżniki (dieta > 0,3) stanowiły zwykle 9–25% populacji, a po 80 tys. ticków populacja liczyła od ok. 600 do ok. 1200 organizmów (3 seedy).'],
+    concepts: ['organism', 'tick', 'energy', 'brain', 'predation'],
+    action: { worlds: [{ name: 'Lekcja: pierwszy świat' }], speed: { label: '10×', tps: 300 }, openTab: 'org' },
+  },
+  {
+    id: 'sense-cost',
+    title: 'Cena zmysłów: dobór naturalny w praktyce',
+    level: 'średni',
+    minutes: 10,
+    goal: 'Zobaczysz, że ewolucja „oszczędza” to, co kosztuje, i do czego prowadzi zbyt wysoki koszt.',
+    intro: [
+      'Dalekie widzenie kosztuje energię (rośnie z kwadratem zasięgu). Hipoteza: jeśli podniesiemy ten koszt, dobór naturalny będzie premiował organizmy z krótszym wzrokiem.',
+      'Uruchomimy dwa światy z tym samym seedem: w jednym normalny koszt sensorów, w drugim 50 razy wyższy. Różnica będzie efektem tej jednej zmiany.',
+    ],
+    steps: [
+      'Poczekaj, aż oba światy dojdą do ok. 20 tys. ticków (na tempie MAX to kilkanaście–kilkadziesiąt sekund).',
+      'Otwórz zakładkę Porównanie i wybierz metrykę „Średnia: sense” (zasięg zmysłów).',
+      'Zmień metrykę na „Udział drapieżników (dieta > 0,3)”, a potem na „Różnorodność cech”.',
+      'Opcjonalnie: w zakładce Eksperyment uruchom Test A/B dla parametru „Koszt sensorów”, żeby uzyskać wartość p.',
+    ],
+    lookFor: ['Linia świata „Sensory 50× droższe” powinna schodzić ku zeru na wykresie zasięgu zmysłów.', 'Co dzieje się z drapieżnikami — czy też ucierpieli?'],
+    observed: [
+      'Po 20 tys. ticków (średnia z 4 seedów): zasięg zmysłów 0,36 ± 0,14 przy normalnym koszcie i 0,02 ± 0,01 przy koszcie 50× wyższym.',
+      'Udział drapieżników spadł z ok. 21% do ok. 2%, a różnorodność cech z 0,16 do 0,06 — bez wzroku trudno polować.',
+      'Przy koszcie zerowym zasięg wyszedł 0,35 ± 0,20, czyli tyle samo co przy domyślnym: normalny koszt sensorów nie jest tu czynnikiem ograniczającym.',
+    ],
+    caveat: 'Zasięg 0,02 to wciąż ok. 13 jednostek — organizm nadal „czuje” sąsiednie komórki. Nie ma tu zwierząt całkiem ślepych.',
+    concepts: ['tradeoff', 'param.senseCoef', 'trait.sense', 'selection', 'metabolism'],
+    action: {
+      worlds: [
+        { name: 'Normalny koszt sensorów' },
+        { name: 'Sensory 50× droższe', params: { senseCoef: 0.0003 } },
+      ],
+      speed: MAX,
+      openTab: 'cmp',
+    },
+  },
+  {
+    id: 'predators',
+    title: 'Drapieżnik i ofiara: kaskada troficzna',
+    level: 'średni',
+    minutes: 12,
+    goal: 'Porównasz świat bez drapieżników i z drapieżnikami i zobaczysz, jak drapieżnictwo zmienia całą resztę.',
+    intro: [
+      'W naturze drapieżnik ogranicza liczbę ofiar, a te przestają wyjadać pokarm. W efekcie rośnie to, co ofiary jadły — to kaskada troficzna.',
+      'W GENESIS drapieżnictwo to zdolność (gen diety i atak jako wyjście sieci), nie wpisane zachowanie. Wyłączymy ją w jednym świecie i porównamy dalszy bieg wydarzeń.',
+    ],
+    steps: [
+      'Poczekaj, aż oba światy dojdą do ok. 30 tys. ticków.',
+      'Zakładka Porównanie → metryki: „Populacja”, „Zasoby (ułamek pojemności)”, „Różnorodność cech”, „Średnia: size”.',
+      'W świecie „Z drapieżnikami” ustaw kolor na „Dieta”, żeby zobaczyć, gdzie żyją drapieżniki.',
+    ],
+    lookFor: ['Czy zasoby (zielone tło) są w obu światach wyjedzone tak samo?', 'Który świat ma więcej organizmów, a który większą różnorodność?'],
+    observed: [
+      'Po 30 tys. ticków (średnia z 5 seedów): populacja 1265 ± 413 bez drapieżników i 682 ± 129 z nimi.',
+      'Zasoby stały na ok. 5% pojemności bez drapieżników i na ok. 42% z drapieżnikami — ofiary były przetrzebione, więc pastwisko odrastało.',
+      'Różnorodność cech: 0,08 ± 0,04 bez drapieżników vs 0,15 ± 0,04 z nimi; średni rozmiar ciała 0,12 vs 0,27, zasięg zmysłów 0,22 vs 0,41.',
+    ],
+    caveat: '5 seedów to niewiele; do poważnego wniosku użyj Testu A/B z kilkunastoma seedami. Wynik dotyczy domyślnych ustawień.',
+    concepts: ['predation', 'trophic', 'exclusion', 'niche', 'lotka'],
+    action: {
+      worlds: [
+        { name: 'Bez drapieżników', setup: { founderDietMax: 0 }, params: { predationPower: 0 } },
+        { name: 'Z drapieżnikami' },
+      ],
+      speed: MAX,
+      openTab: 'cmp',
+    },
+  },
+  {
+    id: 'founders',
+    title: 'Efekt założyciela: ilu zaczyna, tyle zmienności',
+    level: 'średni',
+    minutes: 8,
+    goal: 'Zobaczysz, że populacja może szybko odbudować liczebność, ale nie zmienność genetyczną.',
+    intro: ['Cała zmienność zaczyna się u założycieli i z mutacji. Hipoteza: jeśli założycieli jest mało, populacja urośnie, ale będzie niemal jednorodna.'],
+    steps: [
+      'Poczekaj do ok. 15 tys. ticków w obu światach.',
+      'Zakładka Porównanie → „Populacja”: czy światy się zrównały liczebnie?',
+      'Potem „Różnorodność cech” i „Liczba żyjących kladów”.',
+    ],
+    lookFor: ['Populacje szybko się zrównują, ale różnorodność już nie.', 'W świecie z 25 założycielami zwykle zostaje jeden klad.'],
+    observed: [
+      'Po 15 tys. ticków (średnia z 6 seedów): populacja 595 ± 267 (25 założycieli) vs 679 ± 193 (400) — podobna.',
+      'Różnorodność cech 0,06 ± 0,03 vs 0,16 ± 0,02; liczba kladów 1,7 vs 5,2.',
+    ],
+    concepts: ['founder', 'drift', 'diversity', 'clade'],
+    action: {
+      worlds: [
+        { name: '25 założycieli', setup: { initialPopulation: 25 } },
+        { name: '400 założycieli' },
+      ],
+      speed: MAX,
+      openTab: 'cmp',
+    },
+  },
+  {
+    id: 'mutations',
+    title: 'Mutacje: paliwo i podatek ewolucji',
+    level: 'średni',
+    minutes: 10,
+    goal: 'Zobaczysz, że mutacje tworzą różnorodność, ale zbyt wiele z nich obniża liczebność.',
+    intro: ['Mutacje są jedynym źródłem nowej zmienności, ale większość zmian szkodzi. Przy zerze mutacji ewolucja może jedynie wybierać spośród istniejących wariantów; przy zbyt wielu potomek psuje to, co odziedziczył.'],
+    steps: [
+      'Utwórz trzy światy lub użyj Testu A/B: częstość mutacji 0, 0,04 (domyślna) i 0,2.',
+      'Poczekaj do ok. 30 tys. ticków i porównaj „Różnorodność cech” oraz „Populacja”.',
+    ],
+    lookFor: ['Różnorodność rośnie razem z częstością mutacji.', 'Populacja przy bardzo wysokiej częstości jest mniejsza (obciążenie mutacyjne).'],
+    observed: [
+      'Po 30 tys. ticków (średnia z 4 seedów): różnorodność cech 0,12 (0 mutacji), 0,16 (0,04) i 0,19 (0,2).',
+      'Końcowa populacja: 891 ± 243, 678 ± 148 i 555 ± 41 — im więcej mutacji, tym mniej organizmów.',
+    ],
+    caveat: 'Przy zerze mutacji ewolucja nie ustaje: wciąż działa dobór na wariantach założycieli. Różnica po 30 tys. ticków jest umiarkowana; dłuższych przebiegów nie sprawdzano.',
+    concepts: ['mutation', 'param.mutationRate', 'diversity', 'selection'],
+    action: {
+      worlds: [
+        { name: 'Bez mutacji', params: { mutationRate: 0 } },
+        { name: 'Mutacje domyślne' },
+        { name: 'Bardzo wysokie mutacje', params: { mutationRate: 0.2 } },
+      ],
+      speed: MAX,
+      openTab: 'cmp',
+    },
+  },
+  {
+    id: 'sex',
+    title: 'Płeć: czy rekombinacja pomaga?',
+    level: 'średni',
+    minutes: 12,
+    goal: 'Porównasz rozmnażanie bezpłciowe i płciowe — i zobaczysz, że teoria nie zawsze daje przewidywany wynik.',
+    intro: [
+      'Przy rozmnażaniu płciowym geny dwóch rodziców się mieszają. Teoretycznie to powinno zwiększać zmienność i uwalniać korzystne geny od niekorzystnych (osłabiać hitchhiking).',
+      'Sprawdźmy, co z tego widać w tym świecie.',
+    ],
+    steps: ['Poczekaj do ok. 30 tys. ticków.', 'Zakładka Porównanie → „Liczba żyjących kladów”, „Różnorodność cech”, „Populacja”, „Średnia: sense”.'],
+    lookFor: ['Czy w świecie płciowym przeżywa więcej linii założycieli?', 'Czy różnorodność cech rzeczywiście jest wyższa?'],
+    observed: [
+      'Po 30 tys. ticków (średnia z 5 seedów): liczba żyjących kladów 2,6 ± 0,9 (bezpłciowo) vs 5,0 ± 1,6 (płciowo); populacja 682 ± 129 vs 935 ± 312.',
+      'Różnorodność cech nie była wyższa: 0,15 ± 0,04 vs 0,12 ± 0,01. Zasięg zmysłów w świecie płciowym wyszedł wyraźnie niższy (0,41 vs 0,12).',
+    ],
+    caveat: 'Spodziewany efekt (wyższa różnorodność cech) nie wystąpił; widać natomiast więcej kladów. To dobry przykład na to, że teoria i konkretna miara mogą się rozejść. Klad w trybie płciowym jest definiowany po pierwszym rodzicu.',
+    concepts: ['sexual', 'crossover', 'hitchhiking', 'clonal', 'clade'],
+    action: {
+      worlds: [{ name: 'Bezpłciowo' }, { name: 'Płciowo', params: { sexual: 1 } }],
+      speed: MAX,
+      openTab: 'cmp',
+    },
+  },
+  {
+    id: 'seasons',
+    title: 'Zima nadchodzi: pory roku jako filtr',
+    level: 'średni',
+    minutes: 12,
+    goal: 'Sprawdzisz, kogo „odsiewa” cykliczna zima.',
+    intro: ['W świecie z porami roku co jakiś czas spada temperatura i tempo wzrostu zasobów. To okresowy test odporności, zapasów i zależności pokarmowych.'],
+    steps: [
+      'Poczekaj do ok. 30 tys. ticków (kilka pełnych cykli po 8000 ticków).',
+      'Zakładka Porównanie → „Populacja”: czy liczebność faluje razem z porami?',
+      'Sprawdź „Udział drapieżników” i „Różnorodność cech”.',
+    ],
+    lookFor: ['Regularne fale liczebności w świecie z porami roku.', 'Którzy mieszkańcy radzą sobie gorzej w sezonie: drapieżnicy czy roślinożercy?'],
+    observed: [
+      'Po 30 tys. ticków (średnia z 4 seedów): udział drapieżników 22% ± 4 przy stałym klimacie i 5% ± 11 z porami roku; różnorodność cech 0,16 vs 0,10; pokolenia 69 vs 52.',
+      'Końcowa populacja była podobna (678 vs 727). Czy liczebność faluje w rytmie pór roku, sprawdź sam na wykresie „Populacja i demografia”.',
+    ],
+    caveat: 'Dlaczego drapieżników jest mniej, nie sprawdzano — to kolejna hipoteza do zbadania (np. drapieżnicy tracą ofiary zimą, lub ucierpieli bardziej przez zimno).',
+    concepts: ['seasons', 'temperature', 'trait.coldTolerance', 'selection'],
+    action: {
+      worlds: [
+        { name: 'Stały klimat' },
+        { name: 'Pory roku', params: { seasonPeriod: 8000, seasonTempAmp: 0.35, seasonGrowthAmp: 0.6 } },
+      ],
+      speed: MAX,
+      openTab: 'cmp',
+    },
+  },
+  {
+    id: 'bottleneck',
+    title: 'Katastrofa: wąskie gardło populacji',
+    level: 'średni',
+    minutes: 10,
+    goal: 'Sprawdzisz, czy masowe wymieranie zostawia trwały ślad w zmienności.',
+    intro: [
+      'Po katastrofie przeżywają przypadkowi, a z nimi tylko część genów. Hipoteza z podręczników: po wąskim gardle różnorodność spada.',
+      'Użyjemy rozwidlenia: dwa identyczne światy, w jednym wywołasz katastrofę o sile 0,9.',
+    ],
+    steps: [
+      'Uruchom lekcję i poczekaj do ok. 20 tys. ticków w świecie „Kontrola”.',
+      'W zakładce Eksperyment kliknij „Rozwidl od teraz”. W nowej zakładce otwórz Środowisko, ustaw siłę 0,9 i kliknij „Katastrofa”.',
+      'Po kolejnych 10 tys. ticków porównaj w zakładce Porównanie „Różnorodność cech”, „Populacja” i „Liczba żyjących kladów”.',
+    ],
+    lookFor: ['Spadek liczebności i jego odbudowę.', 'Czy po katastrofie coś zostaje w różnorodności?'],
+    observed: [
+      'W teście (5 seedów, katastrofa 90% po 20 tys. ticków, pomiar 10 tys. ticków później): różnorodność cech 0,147 ± 0,043 w kontroli i 0,147 ± 0,047 po katastrofie; liczba kladów 2,6 vs 2,8; populacja 682 vs 743.',
+      'Czyli po 10 tys. ticków (kilkanaście pokoleń) populacja w pełni się odbudowała, a po 90% strat nie było śladu w różnorodności. Ok. 70 ocalałych miało dość zmienności, a mutacje szybko ją uzupełniły.',
+    ],
+    caveat: 'To NIE znaczy, że wąskie gardło nigdy nie ma skutków: nie sprawdzano silniejszych katastrof (np. 99%) ani dłuższych okresów. Świat jest tu po prostu odporny na tę skalę wstrząsu.',
+    concepts: ['bottleneck', 'event.cull', 'drift', 'diversity', 'fork'],
+    action: { worlds: [{ name: 'Kontrola' }], speed: MAX, openLeft: 'exp', openTab: 'stats' },
+  },
+  {
+    id: 'wander',
+    title: 'Hipoteza, która nie przeszła: wędrujące plamy',
+    level: 'zaawansowany',
+    minutes: 15,
+    goal: 'Zobaczysz, jak wygląda obalona hipoteza — i dlaczego to też jest wynik.',
+    intro: [
+      'Hipoteza: gdy żyzne plamy dryfują i wygasają, „dobre miejsce” ciągle się zmienia, więc opłaca się daleki wzrok i pamięć (żeby szukać nowych plam).',
+      'Brzmi rozsądnie — sprawdzamy testem ablacji, który mierzy, czy zmysł naprawdę się opłaca.',
+    ],
+    steps: [
+      'Poczekaj do ok. 60–80 tys. ticków w obu światach (to kilka minut na MAX).',
+      'W obu światach otwórz Statystyki → „Test ablacji zmysłów” → „Uruchom test”.',
+      'Porównaj wiersze „Pamięć rekurencyjna” i „Zmysł pokarmu” oraz średni zasięg zmysłów w Porównaniu („Średnia: sense”).',
+    ],
+    lookFor: ['Czy zasięg zmysłów w świecie z wędrującymi plamami jest większy?', 'Czy test ablacji pokazuje przewagę pamięci?'],
+    observed: [
+      'Po 80 tys. ticków (3 seedy) zasięg zmysłów w świecie z wędrującymi plamami spadł do 0,02–0,04, czyli niemal do minimum — hipoteza o dalekim wzroku nie sprawdziła się.',
+      'Pamięć nie dała istotnej przewagi: z dla przeżycia wyniosło 0,0, 1,9 i −0,2 (w domyślnym świecie w tych samych seedach bywało 5,7 i 3,4).',
+      'Zmysł pokarmu pozostał bardzo korzystny (z dla przeżycia 2,9; 18,3; 16,1), a drapieżnicy wymarli w 2 z 3 seedów.',
+    ],
+    caveat:
+      'Prawdopodobne wyjaśnienie (niesprawdzone): plamy dryfują wolno (0,15 jednostki na tick) w porównaniu z szybkością organizmów (ok. 1–2), więc lokalne podążanie po gradiencie pokarmu wystarcza. Spróbuj dryfu 1,0 i krótszego życia plam — tu nie ma pomiarów.',
+    concepts: ['patches', 'memory', 'ablation', 'cohort', 'multiple'],
+    action: {
+      worlds: [
+        { name: 'Plamy nieruchome' },
+        { name: 'Plamy wędrujące', setup: { patchCount: 5 }, params: { patchDrift: 0.15, patchLife: 8000 } },
+      ],
+      speed: MAX,
+      openTab: 'stats',
+    },
+  },
+  {
+    id: 'memory',
+    title: 'Czy mózg naprawdę używa pamięci?',
+    level: 'zaawansowany',
+    minutes: 15,
+    goal: 'Nauczysz się czytać test ablacji i odróżniać prawdziwy efekt od przypadku.',
+    intro: [
+      'Organizmy mają 3 komórki pamięci, ale sama możliwość nie znaczy, że z niej korzystają. Test ablacji odbiera pamięć połowie organizmów w tym samym świecie i porównuje ich przeżycie i potomstwo.',
+      'Uwaga: porównań jest 12 (6 zmysłów × 2 miary), więc część „istotnych” wyników pojawia się przypadkiem. Za istotne uznaj dopiero |z| ≥ 3.',
+    ],
+    steps: [
+      'Uruchom lekcję i poczekaj na tempie MAX do ok. 60–80 tys. ticków.',
+      'Statystyki → „Test ablacji zmysłów” → „Uruchom test” (kilka sekund; symulacja tego świata jest wtedy wstrzymana).',
+      'Sprawdź wiersz „Czucie temperatury” — powinien wyjść dokładnie 0 (to stałe wejście; kontrola metody).',
+      'Przeczytaj wiersze „Pamięć rekurencyjna” i „Zmysł pokarmu”. Kliknij „?” przy karcie, by zobaczyć metodę.',
+    ],
+    lookFor: ['Wiersze z |z| ≥ 3 (jaśniejsze).', 'Czy pamięć daje dodatnią różnicę w przeżyciu lub potomstwie?', 'Jak zmienia się wynik, gdy powtórzysz test w innym świecie z innym seedem?'],
+    observed: [
+      'Pamięć opłaciła się w 2 z 3 seedów po 80 tys. ticków (przeżycie +21 i +10 punktów procentowych, z = 5,7 i 3,4); w trzecim — brak efektu.',
+      'W jednym przebiegu 1 mln ticków (seed 5): po 500 tys. ticków efekt na granicy istotności (potomstwo, z = 2,8), po 1 mln — brak, gdy drapieżnicy już wymarli.',
+      'Zmysł pokarmu zwiększał przeżycie w 4 z 5 zbadanych populacji (+22 do +55 pp). Test pokazuje, że zmysł jest używany i się opłaca, nie to, co sieć z pamięcią robi.',
+    ],
+    caveat: 'To pojedyncze pomiary kilku seedów, bez korekty na wielokrotne testowanie.',
+    concepts: ['memory', 'ablation', 'cohort', 'zscore', 'multiple', 'reflex'],
+    action: { worlds: [{ name: 'Lekcja: pamięć' }], speed: MAX, openTab: 'stats' },
+  },
+  {
+    id: 'ab-test',
+    title: 'Test A/B: czy drapieżniki naprawdę zmniejszają populację?',
+    level: 'zaawansowany',
+    minutes: 10,
+    goal: 'Przeprowadzisz kontrolowany eksperyment z wieloma seedami i przeczytasz przedział ufności oraz wartość p.',
+    intro: [
+      'Jeden przebieg to jedna historia. Test A/B uruchamia ten sam świat z wieloma seedami przy dwóch wartościach parametru i sprawdza, czy różnica jest większa niż losowy rozrzut.',
+    ],
+    steps: [
+      'Uruchom lekcję (otworzy się zakładka Eksperyment i świat do odniesienia).',
+      'Przewiń do karty „Test A/B dwóch ustawień”. Parametr: „Siła ataku drapieżników”; A = 0, B = 4; seedów: 8; ticków: 8000; metryka: „Populacja końcowa”.',
+      'Kliknij „Uruchom” i poczekaj. Przeczytaj różnicę B − A z przedziałem ufności i wartość p.',
+      'Powtórz z inną metryką, np. „Różnorodność cech”.',
+    ],
+    lookFor: ['Czy przedział ufności różnicy zawiera 0?', 'Czy p < 0,05? A czy to „dużo” w sensie praktycznym?'],
+    observed: ['W teście z 4 seedami i 3000 ticków (przykład z interfejsu): populacja 984 przy A = 0 vs 648 przy B = 4; różnica −337, p = 0,015.'],
+    caveat: 'Wartość p nie mówi, że hipoteza jest prawdziwa, tylko jak mało prawdopodobna jest taka różnica przy braku efektu. Brak istotności przy małej liczbie seedów niczego nie dowodzi.',
+    concepts: ['ab', 'welch', 'pvalue', 'ci95', 'series'],
+    action: { worlds: [{ name: 'Odniesienie do testu A/B' }], speed: { label: '10×', tps: 300 }, openLeft: 'exp', openTab: 'stats' },
+  },
+];

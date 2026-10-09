@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { GlRenderer, type ViewState } from '../render/glRenderer';
 import type { FrameMsg, ColorMode } from '../worker/protocol';
 import type { WorldClient } from './client';
+import { Help } from './help/Help';
 import { useManager } from './hooks';
 
 const COLOR_MODES: { id: ColorMode; label: string; hint: string }[] = [
@@ -321,6 +322,7 @@ export function WorldView({ client }: { client: WorldClient }) {
         <button className="chip" onClick={fit} title="Dopasuj widok do świata">
           ⌖
         </button>
+        <Help id="ui.overlays" className="hud-help" />
       </div>
       <div className="hud tr">
         <label className="select-wrap" title={COLOR_MODES.find((m) => m.id === client.view.colorMode)?.hint}>
@@ -333,6 +335,7 @@ export function WorldView({ client }: { client: WorldClient }) {
             ))}
           </select>
         </label>
+        <Help id="ui.color" className="hud-help" />
       </div>
       {info?.status === 'extinct' && (
         <div className="banner extinct">
@@ -340,6 +343,9 @@ export function WorldView({ client }: { client: WorldClient }) {
           <span>Populacja wymarła w ticku {info.tick.toLocaleString('pl-PL')}. Zresetuj lub rozwidl wcześniejszy zapis.</span>
         </div>
       )}
+      <div className="hud bl">
+        <Help id="ui.world" className="hud-help" />
+      </div>
       {!client.ready && <div className="empty">Inicjalizacja świata…</div>}
     </div>
   );

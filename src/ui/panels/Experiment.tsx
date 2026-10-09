@@ -9,6 +9,7 @@ import type { FromSeries, ToSeries } from '../../worker/protocol';
 import { manager, type WorldClient } from '../client';
 import { fmt, useManager } from '../hooks';
 import { PRESETS } from '../presets';
+import { Help } from '../help/Help';
 import { AbTest, SweepRunner } from './Sweep';
 
 function download(client: WorldClient, kind: 'stats-csv' | 'experiment-json' | 'lineage-json' | 'population-csv') {
@@ -66,7 +67,10 @@ function SeriesRunner({ client }: { client: WorldClient }) {
   return (
     <section className="card">
       <header>
-        <h4>Seria seedów</h4>
+        <h4>
+          Seria seedów
+          <Help id="series" />
+        </h4>
         <span className="hint">ta sama konfiguracja, headless w osobnym wątku</span>
       </header>
       <div className="form-grid">
@@ -186,7 +190,10 @@ export function ExperimentPanel({ client }: { client: WorldClient }) {
     <div className="panel-body">
       <section className="card">
         <header>
-          <h4>Bieżący eksperyment</h4>
+          <h4>
+            Bieżący eksperyment
+            <Help id="determinism" />
+          </h4>
           <span className="hint">silnik {ENGINE_VERSION}</span>
         </header>
         {s && info && (
@@ -233,16 +240,25 @@ export function ExperimentPanel({ client }: { client: WorldClient }) {
           <button className="btn danger" onClick={() => confirm(`Usunąć „${client.name}”?`) && manager.remove(client.id)}>
             Usuń świat
           </button>
+          <p className="note span2">
+            Bliźniak od startu <Help id="twin" /> · Rozwidl od teraz <Help id="fork" /> — dwa sposoby na eksperyment A/B.
+          </p>
         </div>
       </section>
 
       <section className="card">
         <header>
-          <h4>Nowy eksperyment</h4>
+          <h4>
+            Nowy eksperyment
+            <Help id="ui.scenario" />
+          </h4>
         </header>
         <div className="form-grid">
           <label className="span2">
-            Scenariusz
+            <span>
+              Scenariusz
+              <Help id="ui.scenario" />
+            </span>
             <select value={preset} onChange={(e) => applyPreset(e.target.value)}>
               {PRESETS.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -253,7 +269,10 @@ export function ExperimentPanel({ client }: { client: WorldClient }) {
           </label>
           <p className="note span2">{PRESETS.find((p) => p.id === preset)?.desc}</p>
           <label>
-            Seed
+            <span>
+              Seed
+              <Help id="seed" />
+            </span>
             <div className="input-btn">
               <input type="number" min={0} value={seed} onChange={(e) => setSeed(Number(e.target.value) >>> 0)} />
               <button className="icon" title="Losowy seed" onClick={() => setSeed(Math.floor(Math.random() * 1e9))}>
@@ -276,11 +295,17 @@ export function ExperimentPanel({ client }: { client: WorldClient }) {
             </select>
           </label>
           <label>
-            Założyciele
+            <span>
+              Założyciele
+              <Help id="ui.founders" />
+            </span>
             <input type="number" min={10} max={3000} step={50} value={pop} onChange={(e) => setPop(Number(e.target.value))} />
           </label>
           <label>
-            Wzorzec żyzności
+            <span>
+              Wzorzec żyzności
+              <Help id="ui.patchcount" />
+            </span>
             <select value={pattern} onChange={(e) => setPattern(e.target.value as FertilityPattern)}>
               <option value="patches">plamy</option>
               <option value="uniform">jednolity</option>
@@ -304,7 +329,10 @@ export function ExperimentPanel({ client }: { client: WorldClient }) {
 
       <section className="card">
         <header>
-          <h4>Eksport danych</h4>
+          <h4>
+            Eksport danych
+            <Help id="exportdata" />
+          </h4>
         </header>
         <div className="btn-grid">
           <button className="btn" onClick={() => download(client, 'stats-csv')}>
@@ -347,7 +375,10 @@ export function SavesPanel({ client }: { client: WorldClient }) {
     <div className="panel-body">
       <section className="card">
         <header>
-          <h4>Zapis stanu</h4>
+          <h4>
+            Zapis stanu
+            <Help id="save" />
+          </h4>
           <span className="hint">pełny stan świata, statystyki i genealogia</span>
         </header>
         <div className="row">
@@ -381,7 +412,10 @@ export function SavesPanel({ client }: { client: WorldClient }) {
           />
         </div>
         <label className="slider-row">
-          <span>Autozapis co</span>
+          <span>
+            Autozapis co
+            <Help id="ui.autosave" />
+          </span>
           <select value={client.autosaveEvery} onChange={(e) => client.setAutosave(Number(e.target.value))}>
             <option value={0}>wyłączony</option>
             <option value={5000}>5 000 ticków</option>

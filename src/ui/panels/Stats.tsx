@@ -4,6 +4,7 @@ import type { AblationRow, StrategyCluster } from '../../engine/analysis';
 import type { ProbeMsg } from '../../worker/protocol';
 import type { WorldClient } from '../client';
 import { Legend, LineChart, type ChartSeries } from '../charts';
+import { Help } from '../help/Help';
 import { fmt, useInterval, useManager } from '../hooks';
 
 export const TRAIT_COLORS: Record<string, string> = {
@@ -22,21 +23,27 @@ export const TRAIT_COLORS: Record<string, string> = {
 
 export const FUNCTIONAL_TRAITS = TRAIT_NAMES.filter((t) => t !== 'hue');
 
-function Kpi({ label, value, sub, tone }: { label: string; value: string; sub?: string; tone?: 'good' | 'bad' | 'warn' }) {
+function Kpi({ label, value, sub, tone, help }: { label: string; value: string; sub?: string; tone?: 'good' | 'bad' | 'warn'; help?: string }) {
   return (
     <div className={`kpi ${tone ?? ''}`}>
-      <span>{label}</span>
+      <span>
+        {label}
+        {help && <Help id={help} />}
+      </span>
       <b>{value}</b>
       {sub && <small>{sub}</small>}
     </div>
   );
 }
 
-function ChartCard({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
+function ChartCard({ title, hint, help, children }: { title: string; hint?: string; help?: string; children: React.ReactNode }) {
   return (
     <section className="card">
       <header>
-        <h4>{title}</h4>
+        <h4>
+          {title}
+          {help && <Help id={help} />}
+        </h4>
         {hint && <span className="hint">{hint}</span>}
       </header>
       {children}
@@ -58,7 +65,10 @@ function BehaviorProbes({ client }: { client: WorldClient }) {
   return (
     <section className="card">
       <header>
-        <h4>Sondy zachowań</h4>
+        <h4>
+          Sondy zachowań
+          <Help id="probes" />
+        </h4>
         <span className="hint">czy mózgi reagują na bodźce? wynik vs losowe sieci</span>
       </header>
       {!res || res.n === 0 ? (
@@ -108,7 +118,10 @@ function StrategiesCard({ client }: { client: WorldClient }) {
   return (
     <section className="card">
       <header>
-        <h4>Strategie w populacji</h4>
+        <h4>
+          Strategie w populacji
+          <Help id="strategies" />
+        </h4>
         <span className="hint">k-średnie po cechach fizycznych (k=4)</span>
       </header>
       {clusters.length === 0 ? (
@@ -164,7 +177,10 @@ function AblationCard({ client }: { client: WorldClient }) {
   return (
     <section className="card">
       <header>
-        <h4>Test ablacji zmysłów</h4>
+        <h4>
+          Test ablacji zmysłów
+          <Help id="ablation" />
+        </h4>
         <span className="hint">czy zmysł się opłaca? połowa populacji go traci</span>
       </header>
       <div className="row">
@@ -268,8 +284,20 @@ export function StatsPanel({ client }: { client: WorldClient }) {
   const birthsRate = s.recentRate('births');
   const deathsRate = s.recentRate('deaths');
 
+  const CHART_HELP: Record<string, string> = {
+    'Populacja i demografia': 'chart.pop',
+    'Ewolucja cech (średnie)': 'chart.traits',
+    'Energia i zasoby': 'chart.energy',
+    'Różnorodność genetyczna': 'chart.diversity',
+    Pokolenia: 'chart.gens',
+    'Przyczyny zgonów': 'chart.deaths',
+    Drapieżnictwo: 'chart.predation',
+    'Klady (linie założycieli)': 'chart.clades',
+    'Złożoność mózgu i długość życia': 'chart.brain',
+    'Przepływ energii': 'chart.flow',
+  };
   const chart = (title: string, hint: string, d: { ys: ArrayLike<number>[]; series: ChartSeries[]; legend: { label: string; color: string; value: string }[] }, extra: { yMin?: number; yMax?: number } = {}) => (
-    <ChartCard title={title} hint={hint}>
+    <ChartCard title={title} hint={hint} help={CHART_HELP[title]}>
       <Legend items={d.legend} />
       {none ? <div className="chart-empty">Zbieranie danych…</div> : <LineChart x={x} ys={d.ys} series={d.series} epoch={epoch} {...extra} />}
     </ChartCard>
@@ -278,15 +306,15 @@ export function StatsPanel({ client }: { client: WorldClient }) {
   return (
     <div className="panel-body">
       <div className="kpis">
-        <Kpi label="Żywe organizmy" value={fmt.int(info?.pop ?? 0)} tone={info?.status === 'extinct' ? 'bad' : undefined} />
-        <Kpi label="Narodziny /1000t" value={fmt.f1(birthsRate)} />
-        <Kpi label="Zgony /1000t" value={fmt.f1(deathsRate)} />
-        <Kpi label="Średni wiek" value={fmt.int(s.last('meanAge'))} sub="ticków" />
-        <Kpi label="Pokolenia (maks.)" value={fmt.int(s.last('maxGen'))} sub={`śr. ${fmt.f1(s.last('meanGen'))}`} />
-        <Kpi label="Śr. energia" value={fmt.pct(s.last('meanEnergy'))} />
-        <Kpi label="Zasoby" value={fmt.pct(s.last('foodFrac'))} sub="pojemności" />
-        <Kpi label="Różnorodność" value={fmt.f3(s.last('diversity'))} sub="śr. σ cech" />
-        <Kpi label="Tempo reprodukcji" value={fmt.f2(s.last('reproRate'))} sub="‰/tick/os." />
+        <Kpi help="kpi.pop" label="Żywe organizmy" value={fmt.int(info?.pop ?? 0)} tone={info?.status === 'extinct' ? 'bad' : undefined} />
+        <Kpi help="kpi.births" label="Narodziny /1000t" value={fmt.f1(birthsRate)} />
+        <Kpi help="kpi.deaths" label="Zgony /1000t" value={fmt.f1(deathsRate)} />
+        <Kpi help="kpi.age" label="Średni wiek" value={fmt.int(s.last('meanAge'))} sub="ticków" />
+        <Kpi help="kpi.gen" label="Pokolenia (maks.)" value={fmt.int(s.last('maxGen'))} sub={`śr. ${fmt.f1(s.last('meanGen'))}`} />
+        <Kpi help="kpi.energy" label="Śr. energia" value={fmt.pct(s.last('meanEnergy'))} />
+        <Kpi help="kpi.resources" label="Zasoby" value={fmt.pct(s.last('foodFrac'))} sub="pojemności" />
+        <Kpi help="kpi.diversity" label="Różnorodność" value={fmt.f3(s.last('diversity'))} sub="śr. σ cech" />
+        <Kpi help="kpi.reprorate" label="Tempo reprodukcji" value={fmt.f2(s.last('reproRate'))} sub="‰/tick/os." />
       </div>
       <StrategiesCard client={client} />
       <BehaviorProbes client={client} />
@@ -303,7 +331,10 @@ export function StatsPanel({ client }: { client: WorldClient }) {
       {chart('Przepływ energii', 'wpływ (odnawianie zasobów) vs rozproszenie (ciepło)', flow)}
       <section className="card">
         <header>
-          <h4>Bilans energii</h4>
+          <h4>
+            Bilans energii
+            <Help id="ledger" />
+          </h4>
           <span className="hint">kontrola poprawności modelu</span>
         </header>
         <div className="kv">
@@ -315,7 +346,10 @@ export function StatsPanel({ client }: { client: WorldClient }) {
           <b>{fmt.big(info?.ledger.organisms ?? 0)}</b>
           <span>W zasobach</span>
           <b>{fmt.big(info?.ledger.food ?? 0)}</b>
-          <span>Niezgodność bilansu</span>
+          <span>
+            Niezgodność bilansu
+            <Help id="chart.balance" />
+          </span>
           <b className={Math.abs(info?.energyImbalance ?? 0) < 1e-3 ? 'ok' : 'bad'}>{(info?.energyImbalance ?? 0).toExponential(1)}</b>
         </div>
       </section>

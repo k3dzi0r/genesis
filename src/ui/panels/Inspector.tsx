@@ -2,14 +2,18 @@ import { useState } from 'react';
 import { TRAIT_LABELS, TRAIT_NAMES } from '../../engine/constants';
 import type { InspectResult } from '../../worker/protocol';
 import type { WorldClient } from '../client';
+import { Help } from '../help/Help';
 import { fmt, useInterval, useManager } from '../hooks';
 import { BrainDiagram, GenomeStrip } from './Brain';
 import { TRAIT_COLORS } from './Stats';
 
-function Bar({ value, color = 'var(--accent)', label, right }: { value: number; color?: string; label: string; right?: string }) {
+function Bar({ value, color = 'var(--accent)', label, right, help }: { value: number; color?: string; label: string; right?: string; help?: string }) {
   return (
     <div className="bar-row">
-      <span>{label}</span>
+      <span>
+        {label}
+        {help && <Help id={help} />}
+      </span>
       <div className="bar">
         <i style={{ width: `${Math.max(0, Math.min(1, value)) * 100}%`, background: color }} />
       </div>
@@ -58,6 +62,7 @@ export function Inspector({ client, goGenealogy }: { client: WorldClient; goGene
           <header>
             <h4>
               #{i.id} <span className="tag dead">zmarły · archiwum</span>
+              <Help id="insp.archive" />
             </h4>
             <span className="hint">pokolenie {i.generation}</span>
           </header>
@@ -89,7 +94,10 @@ export function Inspector({ client, goGenealogy }: { client: WorldClient; goGene
         </section>
         <section className="card">
           <header>
-            <h4>Cechy w chwili narodzin</h4>
+            <h4>
+              Cechy w chwili narodzin
+              <Help id="genome" />
+            </h4>
           </header>
           {TRAIT_NAMES.map((t, k) => (
             <Bar key={t} label={TRAIT_LABELS[t]} value={i.traits[k]} color={TRAIT_COLORS[t]} right={i.traits[k].toFixed(2)} />
@@ -121,15 +129,21 @@ export function Inspector({ client, goGenealogy }: { client: WorldClient; goGene
           </h4>
           <span className="hint">pokolenie {o.generation}</span>
         </header>
-        <Bar label="Energia" value={o.energy / o.maxEnergy} color="#ffd54f" right={`${o.energy.toFixed(1)} / ${o.maxEnergy.toFixed(0)}`} />
-        <Bar label="Zdrowie" value={o.health} color="#7be08a" />
-        <Bar label="Wiek" value={o.age / o.maxAge} color="#90caf9" right={`${fmt.int(o.age)} / ${fmt.int(o.maxAge)}`} />
+        <Bar help="insp.energy" label="Energia" value={o.energy / o.maxEnergy} color="#ffd54f" right={`${o.energy.toFixed(1)} / ${o.maxEnergy.toFixed(0)}`} />
+        <Bar help="insp.health" label="Zdrowie" value={o.health} color="#7be08a" />
+        <Bar help="insp.age" label="Wiek" value={o.age / o.maxAge} color="#90caf9" right={`${fmt.int(o.age)} / ${fmt.int(o.maxAge)}`} />
         <div className="kv">
           <span>Narodziny</span>
           <b>tick {fmt.int(o.birthTick)}</b>
-          <span>Oczekiwana długość życia</span>
+          <span>
+            Oczekiwana długość życia
+            <Help id="insp.expected" />
+          </span>
           <b title="min(limit wieku, wiek + energia / koszt bezczynności)">{fmt.int(o.expectedLifespan)} t.</b>
-          <span>Do śmierci głodowej (bez żerowania)</span>
+          <span>
+            Do śmierci głodowej (bez żerowania)
+            <Help id="insp.starvation" />
+          </span>
           <b>{Number.isFinite(o.starvationIn) ? `${fmt.int(o.starvationIn)} t.` : '∞'}</b>
           <span>Potomstwo</span>
           <b>{o.offspring}</b>
@@ -147,9 +161,15 @@ export function Inspector({ client, goGenealogy }: { client: WorldClient; goGene
               </b>
             </>
           )}
-          <span>Mutacje względem rodzica</span>
+          <span>
+            Mutacje względem rodzica
+            <Help id="insp.mutations" />
+          </span>
           <b>{lin?.mutations ?? 0}</b>
-          <span>Klad (założyciel)</span>
+          <span>
+            Klad (założyciel)
+            <Help id="insp.clade" />
+          </span>
           <b>#{o.clade + 1}</b>
         </div>
         <button className="btn" onClick={goGenealogy}>
@@ -159,7 +179,10 @@ export function Inspector({ client, goGenealogy }: { client: WorldClient; goGene
 
       <section className="card">
         <header>
-          <h4>Geny → fizjologia</h4>
+          <h4>
+            Geny → fizjologia
+            <Help id="genome" />
+          </h4>
         </header>
         {TRAIT_NAMES.map((t, k) => {
           const phys: Record<string, string> = {
@@ -178,7 +201,10 @@ export function Inspector({ client, goGenealogy }: { client: WorldClient; goGene
           return (
             <div key={t} className="trait-row">
               <div className="bar-row">
-                <span>{TRAIT_LABELS[t]}</span>
+                <span>
+                  {TRAIT_LABELS[t]}
+                  <Help id={`trait.${t}`} />
+                </span>
                 <div className="bar">
                   <i style={{ width: `${o.traits[k] * 100}%`, background: TRAIT_COLORS[t] }} />
                 </div>
@@ -189,7 +215,10 @@ export function Inspector({ client, goGenealogy }: { client: WorldClient; goGene
           );
         })}
         <div className="kv" style={{ marginTop: 8 }}>
-          <span>Metabolizm podstawowy</span>
+          <span>
+            Metabolizm podstawowy
+            <Help id="insp.costs" />
+          </span>
           <b>{o.costs.basal.toFixed(4)} /t.</b>
           <span>Sensory</span>
           <b>{o.costs.sense.toFixed(4)} /t.</b>
@@ -204,7 +233,10 @@ export function Inspector({ client, goGenealogy }: { client: WorldClient; goGene
 
       <section className="card">
         <header>
-          <h4>Pamięć rekurencyjna</h4>
+          <h4>
+            Pamięć rekurencyjna
+            <Help id="insp.memory" />
+          </h4>
           <span className="hint">stan wraca na wejścia w następnym ticku</span>
         </header>
         {o.mem.map((v, k) => (
@@ -220,7 +252,10 @@ export function Inspector({ client, goGenealogy }: { client: WorldClient; goGene
 
       <section className="card">
         <header>
-          <h4>Sieć neuronowa</h4>
+          <h4>
+            Sieć neuronowa
+            <Help id="brain.diagram" />
+          </h4>
           <span className="hint">krawędzie: wagi genomu · węzły: bieżąca aktywacja</span>
         </header>
         <BrainDiagram genome={o.genome} inputs={o.inputs} hidden={o.hidden} outputs={o.outputs} />
@@ -228,7 +263,10 @@ export function Inspector({ client, goGenealogy }: { client: WorldClient; goGene
 
       <section className="card">
         <header>
-          <h4>Genom</h4>
+          <h4>
+            Genom
+            <Help id="insp.genome" />
+          </h4>
           <span className="hint">9 cech + {o.genome.length - 9} wag</span>
         </header>
         <GenomeStrip genome={o.genome} />
