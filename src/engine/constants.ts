@@ -3,9 +3,9 @@
  * dlatego podbijamy ENGINE_VERSION przy każdej zmianie mechaniki.
  */
 
-export const ENGINE_VERSION = '0.3.0';
+export const ENGINE_VERSION = '0.5.0';
 /** Wersja formatu zapisu. Zwiększać przy zmianie układu pliku i dodać migrację w serialize.ts. */
-export const FORMAT_VERSION = 2;
+export const FORMAT_VERSION = 4;
 
 /** Nazwy cech fizycznych kodowanych w genomie (wartości znormalizowane do [0,1]). */
 export const TRAIT_NAMES = [
@@ -20,12 +20,24 @@ export const TRAIT_NAMES = [
   'hue',
   'memory',
   'diet',
+  'plantSpecialization',
+  'matePreference',
+  'mateSelectivity',
+  'plasticity',
+  'nicheInvestment',
 ] as const;
 export type TraitName = (typeof TRAIT_NAMES)[number];
 export const N_TRAITS = TRAIT_NAMES.length;
 export const TRAIT_HUE = 8;
 export const TRAIT_MEMORY = 9;
 export const TRAIT_DIET = 10;
+export const TRAIT_PLANT = 11;
+export const TRAIT_MATE_PREFERENCE = 12;
+export const TRAIT_MATE_SELECTIVITY = 13;
+export const TRAIT_PLASTICITY = 14;
+export const TRAIT_NICHE = 15;
+/** Bounded individual observation / location memory. */
+export const TRAIL_LEN = 32;
 
 export const TRAIT_LABELS: Record<TraitName, string> = {
   size: 'Rozmiar',
@@ -39,6 +51,11 @@ export const TRAIT_LABELS: Record<TraitName, string> = {
   hue: 'Znacznik linii (neutralny)',
   memory: 'Trwałość pamięci',
   diet: 'Dieta (0 roślinożerca → 1 drapieżnik)',
+  plantSpecialization: 'Specjalizacja trawienia A → B',
+  matePreference: 'Preferowany fenotyp partnera',
+  mateSelectivity: 'Wybiórczość partnera',
+  plasticity: 'Plastyczność podczas życia',
+  nicheInvestment: 'Zdolność kultywacji',
 };
 
 /**
@@ -48,8 +65,8 @@ export const TRAIT_LABELS: Record<TraitName, string> = {
  */
 export const N_MEM = 3;
 export const N_HID = 8;
-export const N_IN = 12 + N_MEM + 2;
-export const N_OUT = 4 + N_MEM;
+export const N_IN = 12 + N_MEM + 2 + 6;
+export const N_OUT = 4 + N_MEM + 2;
 /** indeksy wejść specjalnych */
 export const IN_MEM = 12;
 export const IN_NB_SIZE = 12 + N_MEM;
@@ -60,6 +77,14 @@ export const OUT_THRUST = 1;
 export const OUT_EAT = 2;
 export const OUT_ATTACK = 3;
 export const OUT_MEM = 4;
+export const OUT_SIGNAL = 7;
+export const OUT_CULTIVATE = 8;
+export const IN_FOOD_B_FWD = 17;
+export const IN_FOOD_B_LAT = 18;
+export const IN_FOOD_B_AMOUNT = 19;
+export const IN_SIGNAL = 20;
+export const IN_SIGNAL_FWD = 21;
+export const IN_SIGNAL_LAT = 22;
 
 export const INPUT_LABELS = [
   'bias',
@@ -79,8 +104,14 @@ export const INPUT_LABELS = [
   'pamięć 3',
   'rozmiar sąsiada',
   'dieta sąsiada',
+  'pokarm B ↑',
+  'pokarm B ←',
+  'pokarm B ilość',
+  'sygnał',
+  'sygnał ↑',
+  'sygnał ←',
 ] as const;
-export const OUTPUT_LABELS = ['skręt', 'ciąg', 'jedzenie', 'atak', 'zapis pam. 1', 'zapis pam. 2', 'zapis pam. 3'] as const;
+export const OUTPUT_LABELS = ['skręt', 'ciąg', 'jedzenie', 'atak', 'zapis pam. 1', 'zapis pam. 2', 'zapis pam. 3', 'sygnał', 'kultywacja'] as const;
 
 export const W1_OFF = N_TRAITS; // [N_HID][N_IN]
 export const B1_OFF = W1_OFF + N_HID * N_IN; // [N_HID]

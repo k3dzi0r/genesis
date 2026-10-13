@@ -1,4 +1,6 @@
+import { PRESETS } from '../presets';
 import type { Lesson } from './types';
+import { GUIDED_LESSONS } from './guided';
 
 /**
  * Lekcje: gotowe eksperymenty. Pole `observed` zawiera WYŁĄCZNIE to, co zmierzono w testach autora
@@ -8,6 +10,26 @@ import type { Lesson } from './types';
 const MAX = { label: 'MAX', tps: 1e9 };
 
 export const LESSONS: Lesson[] = [
+  ...GUIDED_LESSONS,
+  ...PRESETS.filter((p) => ['integrated','two-foods','perception','communication','speciation','learning','cultivation'].includes(p.id)).map<Lesson>((p) => ({
+    id: `development-${p.id}`, title: p.name, level: 'średni', minutes: 10,
+    goal: p.desc, intro: ['To nowy scenariusz v0.4. Mechanika działa, a wynik ewolucyjny jest hipotezą do sprawdzenia w kilku seedach.'],
+    steps: ['Uruchom scenariusz i obserwuj kilka tysięcy ticków. Zatrzymaj świat, aby porównać jego stan.', 'W Atlasie porównaj realny ruch, żerowanie i grupy zgodności partnerów. Zachowaj ciekawy okaz.', 'W Historii wróć do wcześniejszego ticku, rozwidl moment i zmień jeden parametr w nowym świecie.', 'W laboratorium porównaj genotyp i stan nauczony lub wyłącz odbiór sygnałów w ablacji.'],
+    lookFor: ['Zmiany mierzonego zachowania i liczby potomstwa.', 'Trwałość różnic przy powtórzeniu na innych seedach.'],
+    caveat: 'Nie ma jeszcze pomiarów długiej ewolucji v0.4. Korzyść sygnału nie dowodzi współpracy, a grupa zgodności nie dowodzi trwałego gatunku.',
+    concepts: ['atlas','history','lab','communication','isolation','plasticity','cultivation'],
+    action: { worlds: [{ name: p.name, setup: p.setup as unknown as Record<string, unknown>, params: p.params }], speed: { label: '10×', tps: 300 }, openTab: 'atlas' },
+  })),
+  { id: 'history-world', title: 'Przeszłość i alternatywna przyszłość', level: 'start', minutes: 5, goal: 'Odtworzysz dawny moment i stworzysz jego alternatywną przyszłość.',
+    intro: ['Historia odtwarza pełny stan i ówczesną genealogię w ograniczonym oknie retencji.'],
+    steps: ['Uruchom świat przez 1000 ticków i zatrzymaj go.', 'Wpisz wcześniejszy tick w Historii i kliknij Pokaż moment.', 'Kliknij Rozwidl tutaj. W nowym świecie zmień jeden parametr i uruchom dalszy bieg.'],
+    lookFor: ['Ten sam stan przed interwencją; różne przyszłości po zmianie.', 'Zakres retencji oraz możliwość powrotu do zachowanej teraźniejszości.'],
+    concepts: ['history','fork','determinism'], action: { worlds: [{ name: 'Historia świata' }], speed: { label: '10×', tps: 300 }, openTab: 'history' } },
+  { id: 'organism-lab', title: 'Dlaczego ten organizm odniósł sukces?', level: 'zaawansowany', minutes: 10, goal: 'Porównasz przodka i potomka w dawnym oraz obecnym środowisku.',
+    intro: ['Cztery komórki pomagają oddzielić genotyp od środowiska. Stan nauczony trzeba zapisać osobno; genom przodka nie daje jego dawnej pamięci.'],
+    steps: ['Po kilku pokoleniach zaznacz żywy organizm i w laboratorium pobierz go wraz z genomem przodka.', 'Wybierz dawny tick z dostępnego zakresu historii. Uruchom próbę z co najmniej trzema seedami.', 'Sprawdź różnice przeżycia i potomstwa w obu środowiskach. Zachowaj okaz z wynikami.', 'Uruchom osobno próbę jednej zmiany genu albo odroczonej wskazówki z kontrolą pamięci.'],
+    lookFor: ['Wielkość różnic i ich przedziały ufności.', 'Dostępność prawdziwego dawnego środowiska; nowa mapa według parametrów jest inną próbą.'],
+    concepts: ['lab','paired','temporal','atlas'], action: { worlds: [{ name: 'Próby organizmów' }], speed: { label: '10×', tps: 300 }, openTab: 'lab' } },
   {
     id: 'first',
     title: 'Pierwszy świat: co tu się dzieje?',
@@ -27,7 +49,7 @@ export const LESSONS: Lesson[] = [
       'Duże organizmy częściej stoją na plamach niż małe.',
       'Zaznaczony organizm ma wokół siebie kółko zasięgu zmysłów i zostawia ślad.',
     ],
-    observed: ['W domyślnym świecie drapieżniki (dieta > 0,3) stanowiły zwykle 9–25% populacji, a po 80 tys. ticków populacja liczyła od ok. 600 do ok. 1200 organizmów (3 seedy).'],
+    observed: ['Wyniki historycznych pomiarów silnika v0.3; nowa wersja wymaga ponownych prób.', 'W domyślnym świecie drapieżniki (dieta > 0,3) stanowiły zwykle 9–25% populacji, a po 80 tys. ticków populacja liczyła od ok. 600 do ok. 1200 organizmów (3 seedy).'],
     concepts: ['organism', 'tick', 'energy', 'brain', 'predation'],
     action: { worlds: [{ name: 'Lekcja: pierwszy świat' }], speed: { label: '10×', tps: 300 }, openTab: 'org' },
   },
@@ -48,7 +70,7 @@ export const LESSONS: Lesson[] = [
       'Opcjonalnie: w zakładce Eksperyment uruchom Test A/B dla parametru „Koszt sensorów”, żeby uzyskać wartość p.',
     ],
     lookFor: ['Linia świata „Sensory 50× droższe” powinna schodzić ku zeru na wykresie zasięgu zmysłów.', 'Co dzieje się z drapieżnikami — czy też ucierpieli?'],
-    observed: [
+    observed: ['Wyniki historycznych pomiarów silnika v0.3; nowa wersja wymaga ponownych prób.',
       'Po 20 tys. ticków (średnia z 4 seedów): zasięg zmysłów 0,36 ± 0,14 przy normalnym koszcie i 0,02 ± 0,01 przy koszcie 50× wyższym.',
       'Udział drapieżników spadł z ok. 21% do ok. 2%, a różnorodność cech z 0,16 do 0,06 — bez wzroku trudno polować.',
       'Przy koszcie zerowym zasięg wyszedł 0,35 ± 0,20, czyli tyle samo co przy domyślnym: normalny koszt sensorów nie jest tu czynnikiem ograniczającym.',
@@ -80,7 +102,7 @@ export const LESSONS: Lesson[] = [
       'W świecie „Z drapieżnikami” ustaw kolor na „Dieta”, żeby zobaczyć, gdzie żyją drapieżniki.',
     ],
     lookFor: ['Czy zasoby (zielone tło) są w obu światach wyjedzone tak samo?', 'Który świat ma więcej organizmów, a który większą różnorodność?'],
-    observed: [
+    observed: ['Wyniki historycznych pomiarów silnika v0.3; nowa wersja wymaga ponownych prób.',
       'Po 30 tys. ticków (średnia z 5 seedów): populacja 1265 ± 413 bez drapieżników i 682 ± 129 z nimi.',
       'Zasoby stały na ok. 5% pojemności bez drapieżników i na ok. 42% z drapieżnikami — ofiary były przetrzebione, więc pastwisko odrastało.',
       'Różnorodność cech: 0,08 ± 0,04 bez drapieżników vs 0,15 ± 0,04 z nimi; średni rozmiar ciała 0,12 vs 0,27, zasięg zmysłów 0,22 vs 0,41.',
@@ -109,7 +131,7 @@ export const LESSONS: Lesson[] = [
       'Potem „Różnorodność cech” i „Liczba żyjących kladów”.',
     ],
     lookFor: ['Populacje szybko się zrównują, ale różnorodność już nie.', 'W świecie z 25 założycielami zwykle zostaje jeden klad.'],
-    observed: [
+    observed: ['Wyniki historycznych pomiarów silnika v0.3; nowa wersja wymaga ponownych prób.',
       'Po 15 tys. ticków (średnia z 6 seedów): populacja 595 ± 267 (25 założycieli) vs 679 ± 193 (400) — podobna.',
       'Różnorodność cech 0,06 ± 0,03 vs 0,16 ± 0,02; liczba kladów 1,7 vs 5,2.',
     ],
@@ -135,7 +157,7 @@ export const LESSONS: Lesson[] = [
       'Poczekaj do ok. 30 tys. ticków i porównaj „Różnorodność cech” oraz „Populacja”.',
     ],
     lookFor: ['Różnorodność rośnie razem z częstością mutacji.', 'Populacja przy bardzo wysokiej częstości jest mniejsza (obciążenie mutacyjne).'],
-    observed: [
+    observed: ['Wyniki historycznych pomiarów silnika v0.3; nowa wersja wymaga ponownych prób.',
       'Po 30 tys. ticków (średnia z 4 seedów): różnorodność cech 0,12 (0 mutacji), 0,16 (0,04) i 0,19 (0,2).',
       'Końcowa populacja: 891 ± 243, 678 ± 148 i 555 ± 41 — im więcej mutacji, tym mniej organizmów.',
     ],
@@ -163,7 +185,7 @@ export const LESSONS: Lesson[] = [
     ],
     steps: ['Poczekaj do ok. 30 tys. ticków.', 'Zakładka Porównanie → „Liczba żyjących kladów”, „Różnorodność cech”, „Populacja”, „Średnia: sense”.'],
     lookFor: ['Czy w świecie płciowym przeżywa więcej linii założycieli?', 'Czy różnorodność cech rzeczywiście jest wyższa?'],
-    observed: [
+    observed: ['Wyniki historycznych pomiarów silnika v0.3; nowa wersja wymaga ponownych prób.',
       'Po 30 tys. ticków (średnia z 5 seedów): liczba żyjących kladów 2,6 ± 0,9 (bezpłciowo) vs 5,0 ± 1,6 (płciowo); populacja 682 ± 129 vs 935 ± 312.',
       'Różnorodność cech nie była wyższa: 0,15 ± 0,04 vs 0,12 ± 0,01. Zasięg zmysłów w świecie płciowym wyszedł wyraźnie niższy (0,41 vs 0,12).',
     ],
@@ -188,7 +210,7 @@ export const LESSONS: Lesson[] = [
       'Sprawdź „Udział drapieżników” i „Różnorodność cech”.',
     ],
     lookFor: ['Regularne fale liczebności w świecie z porami roku.', 'Którzy mieszkańcy radzą sobie gorzej w sezonie: drapieżnicy czy roślinożercy?'],
-    observed: [
+    observed: ['Wyniki historycznych pomiarów silnika v0.3; nowa wersja wymaga ponownych prób.',
       'Po 30 tys. ticków (średnia z 4 seedów): udział drapieżników 22% ± 4 przy stałym klimacie i 5% ± 11 z porami roku; różnorodność cech 0,16 vs 0,10; pokolenia 69 vs 52.',
       'Końcowa populacja była podobna (678 vs 727). Czy liczebność faluje w rytmie pór roku, sprawdź sam na wykresie „Populacja i demografia”.',
     ],
@@ -219,7 +241,7 @@ export const LESSONS: Lesson[] = [
       'Po kolejnych 10 tys. ticków porównaj w zakładce Porównanie „Różnorodność cech”, „Populacja” i „Liczba żyjących kladów”.',
     ],
     lookFor: ['Spadek liczebności i jego odbudowę.', 'Czy po katastrofie coś zostaje w różnorodności?'],
-    observed: [
+    observed: ['Wyniki historycznych pomiarów silnika v0.3; nowa wersja wymaga ponownych prób.',
       'W teście (5 seedów, katastrofa 90% po 20 tys. ticków, pomiar 10 tys. ticków później): różnorodność cech 0,147 ± 0,043 w kontroli i 0,147 ± 0,047 po katastrofie; liczba kladów 2,6 vs 2,8; populacja 682 vs 743.',
       'Czyli po 10 tys. ticków (kilkanaście pokoleń) populacja w pełni się odbudowała, a po 90% strat nie było śladu w różnorodności. Ok. 70 ocalałych miało dość zmienności, a mutacje szybko ją uzupełniły.',
     ],
@@ -243,7 +265,7 @@ export const LESSONS: Lesson[] = [
       'Porównaj wiersze „Pamięć rekurencyjna” i „Zmysł pokarmu” oraz średni zasięg zmysłów w Porównaniu („Średnia: sense”).',
     ],
     lookFor: ['Czy zasięg zmysłów w świecie z wędrującymi plamami jest większy?', 'Czy test ablacji pokazuje przewagę pamięci?'],
-    observed: [
+    observed: ['Wyniki historycznych pomiarów silnika v0.3; nowa wersja wymaga ponownych prób.',
       'Po 80 tys. ticków (3 seedy) zasięg zmysłów w świecie z wędrującymi plamami spadł do 0,02–0,04, czyli niemal do minimum — hipoteza o dalekim wzroku nie sprawdziła się.',
       'Pamięć nie dała istotnej przewagi: z dla przeżycia wyniosło 0,0, 1,9 i −0,2 (w domyślnym świecie w tych samych seedach bywało 5,7 i 3,4).',
       'Zmysł pokarmu pozostał bardzo korzystny (z dla przeżycia 2,9; 18,3; 16,1), a drapieżnicy wymarli w 2 z 3 seedów.',
@@ -268,7 +290,7 @@ export const LESSONS: Lesson[] = [
     goal: 'Nauczysz się czytać test ablacji i odróżniać prawdziwy efekt od przypadku.',
     intro: [
       'Organizmy mają 3 komórki pamięci, ale sama możliwość nie znaczy, że z niej korzystają. Test ablacji odbiera pamięć połowie organizmów w tym samym świecie i porównuje ich przeżycie i potomstwo.',
-      'Uwaga: porównań jest 12 (6 zmysłów × 2 miary), więc część „istotnych” wyników pojawia się przypadkiem. Za istotne uznaj dopiero |z| ≥ 3.',
+      'Uwaga: porównań jest 14 (7 grup × 2 miary), więc część „istotnych” wyników pojawia się przypadkiem. Za istotne uznaj dopiero |z| ≥ 3.',
     ],
     steps: [
       'Uruchom lekcję i poczekaj na tempie MAX do ok. 60–80 tys. ticków.',
@@ -277,7 +299,7 @@ export const LESSONS: Lesson[] = [
       'Przeczytaj wiersze „Pamięć rekurencyjna” i „Zmysł pokarmu”. Kliknij „?” przy karcie, by zobaczyć metodę.',
     ],
     lookFor: ['Wiersze z |z| ≥ 3 (jaśniejsze).', 'Czy pamięć daje dodatnią różnicę w przeżyciu lub potomstwie?', 'Jak zmienia się wynik, gdy powtórzysz test w innym świecie z innym seedem?'],
-    observed: [
+    observed: ['Wyniki historycznych pomiarów silnika v0.3; nowa wersja wymaga ponownych prób.',
       'Pamięć opłaciła się w 2 z 3 seedów po 80 tys. ticków (przeżycie +21 i +10 punktów procentowych, z = 5,7 i 3,4); w trzecim — brak efektu.',
       'W jednym przebiegu 1 mln ticków (seed 5): po 500 tys. ticków efekt na granicy istotności (potomstwo, z = 2,8), po 1 mln — brak, gdy drapieżnicy już wymarli.',
       'Zmysł pokarmu zwiększał przeżycie w 4 z 5 zbadanych populacji (+22 do +55 pp). Test pokazuje, że zmysł jest używany i się opłaca, nie to, co sieć z pamięcią robi.',
@@ -302,7 +324,7 @@ export const LESSONS: Lesson[] = [
       'Powtórz z inną metryką, np. „Różnorodność cech”.',
     ],
     lookFor: ['Czy przedział ufności różnicy zawiera 0?', 'Czy p < 0,05? A czy to „dużo” w sensie praktycznym?'],
-    observed: ['W teście z 4 seedami i 3000 ticków (przykład z interfejsu): populacja 984 przy A = 0 vs 648 przy B = 4; różnica −337, p = 0,015.'],
+    observed: ['Wyniki historycznych pomiarów silnika v0.3; nowa wersja wymaga ponownych prób.', 'W teście z 4 seedami i 3000 ticków (przykład z interfejsu): populacja 984 przy A = 0 vs 648 przy B = 4; różnica −337, p = 0,015.'],
     caveat: 'Wartość p nie mówi, że hipoteza jest prawdziwa, tylko jak mało prawdopodobna jest taka różnica przy braku efektu. Brak istotności przy małej liczbie seedów niczego nie dowodzi.',
     concepts: ['ab', 'welch', 'pvalue', 'ci95', 'series'],
     action: { worlds: [{ name: 'Odniesienie do testu A/B' }], speed: { label: '10×', tps: 300 }, openLeft: 'exp', openTab: 'stats' },

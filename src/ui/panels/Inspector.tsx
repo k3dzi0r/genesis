@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { TRAIT_LABELS, TRAIT_NAMES } from '../../engine/constants';
+import { N_TRAITS, TRAIT_LABELS, TRAIT_NAMES } from '../../engine/constants';
 import type { InspectResult } from '../../worker/protocol';
 import type { WorldClient } from '../client';
 import { Help } from '../help/Help';
 import { fmt, useInterval, useManager } from '../hooks';
 import { BrainDiagram, GenomeStrip } from './Brain';
+import { putSpecimen } from '../../storage/atlas';
 import { TRAIT_COLORS } from './Stats';
 
 function Bar({ value, color = 'var(--accent)', label, right, help }: { value: number; color?: string; label: string; right?: string; help?: string }) {
@@ -22,10 +23,13 @@ function Bar({ value, color = 'var(--accent)', label, right, help }: { value: nu
   );
 }
 
-export function Inspector({ client, goGenealogy }: { client: WorldClient; goGenealogy: () => void }) {
+export function Inspector({ client, goGenealogy, goAtlas, goLab }: { client: WorldClient; goGenealogy: () => void; goAtlas?: () => void; goLab?: () => void }) {
   useManager();
   const id = client.selectedId;
   const [res, setRes] = useState<InspectResult | null>(null);
+  const [learned, setLearned] = useState(true);
+  const [saved, setSaved] = useState('');
+  const save = async (archived = false) => { try { const r = await client.captureSpecimen(id!, archived); await putSpecimen(r.specimen); setSaved('Okaz zachowany w atlasie.'); } catch (e) { setSaved(String(e)); } };
 
   useInterval(
     async () => {
@@ -88,9 +92,9 @@ export function Inspector({ client, goGenealogy }: { client: WorldClient; goGene
               </>
             )}
           </div>
-          <button className="btn" onClick={goGenealogy}>
-            Otwórz genealogię
-          </button>
+          <button className="btn" onClick={goGenealogy}>Otwórz genealogię</button>
+          <button className="btn" onClick={() => void save(true)}>Zachowaj genom przodka</button>
+          {saved && <p className="note">{saved}</p>}
         </section>
         <section className="card">
           <header>
@@ -175,6 +179,10 @@ export function Inspector({ client, goGenealogy }: { client: WorldClient; goGene
         <button className="btn" onClick={goGenealogy}>
           Genealogia i przodkowie →
         </button>
+        <button className="btn" onClick={() => void save()}>Zachowaj okaz</button>
+        {goAtlas && <button className="btn" onClick={goAtlas}>Atlas</button>}
+        {goLab && <button className="btn" onClick={goLab}>Próby kontrolowane</button>}
+        {saved && <p className="note">{saved}</p>}
       </section>
 
       <section className="card">
@@ -196,6 +204,11 @@ export function Inspector({ client, goGenealogy }: { client: WorldClient; goGene
             bite: `kęs ${p.biteCap.toFixed(2)}/t., sprawność ${fmt.pct(p.assim)}`,
             hue: 'znacznik neutralny (bez wpływu na przeżycie)',
             memory: `stan pamięci utrzymuje się λ = ${p.memDecay.toFixed(2)} na tick`,
+            plantSpecialization: o.traits[11] < 0.5 ? 'Lepsze trawienie A, słabsze B' : 'Lepsze trawienie B, słabsze A; niższa toksyczność B',
+            matePreference: `preferowany fenotyp partnera ${o.traits[12].toFixed(2)}`,
+            mateSelectivity: `tolerancja partnera ${(1 - 0.95 * o.traits[13]).toFixed(2)}`,
+            plasticity: `siła zmian w życiu ×${o.traits[14].toFixed(2)}`,
+            nicheInvestment: `wysiłek kultywacji ×${o.traits[15].toFixed(2)}`,
             diet: p.diet < 0.02 ? 'czysty roślinożerca — nie potrafi atakować' : `atakuje; trawienie roślin ×${(1 - 0.9 * p.diet).toFixed(2)}, mięsa ${fmt.pct(0.85 * p.diet)}`,
           };
           return (
@@ -231,6 +244,10 @@ export function Inspector({ client, goGenealogy }: { client: WorldClient; goGene
         </div>
       </section>
 
+      <section className="card"><header><h4>Rzeczywiste zachowanie</h4><Help id="atlas" /></header>
+        <div className="kv"><span>Czas obserwacji</span><b>{o.observations.observedTicks} ticków</b><span>Przebyta droga</span><b>{o.observations.distance.toFixed(1)}</b><span>Energia A / B / mięsa</span><b>{o.observations.foodAConsumed.toFixed(1)} / {o.observations.foodBConsumed.toFixed(1)} / {o.observations.meatEnergy.toFixed(1)}</b><span>Skuteczne ataki</span><b>{o.observations.successfulAttacks}</b><span>Powroty do miejsc</span><b>{o.observations.revisits}</b><span>Ekspozycja / ucieczki</span><b>{o.observations.threatExposure} / {o.observations.threatEscape}</b><span>Sygnał teraz</span><b>{o.signal.toFixed(3)}</b><span>Kultywacja / przeniesione nasiona</span><b>{o.observations.cultivated.toFixed(3)} / {o.observations.seedsMoved.toFixed(3)}</b><span>Próby partnera / odrzucenia</span><b>{o.observations.mateAttempts} / {o.observations.mateRejected}</b></div>
+        <p className="note">A/B to pobrane zasoby, mięso to przyswojona energia. Powroty i ucieczki są pomiarami ruchu; nie dowodzą zamiaru.</p>
+      </section>
       <section className="card">
         <header>
           <h4>
@@ -256,9 +273,10 @@ export function Inspector({ client, goGenealogy }: { client: WorldClient; goGene
             Sieć neuronowa
             <Help id="brain.diagram" />
           </h4>
-          <span className="hint">krawędzie: wagi genomu · węzły: bieżąca aktywacja</span>
+          <span className="hint">krawędzie: {learned ? "wagi efektywne" : "genom"} · aktywacje: stan efektywny</span>
         </header>
-        <BrainDiagram genome={o.genome} inputs={o.inputs} hidden={o.hidden} outputs={o.outputs} />
+        <label className="network-toggle"><input type="checkbox" checked={learned} onChange={(e) => setLearned(e.target.checked)} /> Pokaż sieć po uczeniu podczas życia</label>
+        <BrainDiagram genome={learned ? o.learnedWeights : o.genome} inputs={o.inputs} hidden={o.hidden} outputs={o.outputs} />
       </section>
 
       <section className="card">
@@ -267,7 +285,7 @@ export function Inspector({ client, goGenealogy }: { client: WorldClient; goGene
             Genom
             <Help id="insp.genome" />
           </h4>
-          <span className="hint">9 cech + {o.genome.length - 9} wag</span>
+          <span className="hint">{N_TRAITS} cech + {o.genome.length - N_TRAITS} wag</span>
         </header>
         <GenomeStrip genome={o.genome} />
       </section>

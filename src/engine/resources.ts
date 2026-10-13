@@ -11,6 +11,15 @@ export class ResourceGrid {
   readonly ny: number;
   food: Float64Array;
   fert: Float32Array;
+  foodB: Float64Array;
+  niche: Float32Array;
+  seedBank: Float32Array;
+  obstacles: Uint8Array;
+  biome: Uint8Array;
+  biomeTemperature: Float32Array;
+  biomeFertility: Float32Array;
+  biomeFoodB: Float32Array;
+  biomeSeason: Float32Array;
 
   constructor(
     width: number,
@@ -21,6 +30,86 @@ export class ResourceGrid {
     this.ny = Math.max(1, Math.ceil(height / cell));
     this.food = new Float64Array(this.nx * this.ny);
     this.fert = new Float32Array(this.nx * this.ny);
+    this.foodB = new Float64Array(this.nx * this.ny);
+    this.niche = new Float32Array(this.nx * this.ny);
+    this.seedBank = new Float32Array(this.nx * this.ny);
+    this.obstacles = new Uint8Array(this.nx * this.ny);
+    this.biome = new Uint8Array(this.cells);
+    this.biomeTemperature = new Float32Array(this.cells);
+    this.biomeFertility = new Float32Array(this.cells);
+    this.biomeFoodB = new Float32Array(this.cells);
+    this.biomeSeason = new Float32Array(this.cells);
+  }
+
+  /** Contiguous seeded habitats, independent of both simulation RNG streams. */
+  generateBiomes(seed: number): void {
+    const phase = ((Math.imul(seed ^ 0x5bd1e995, 1664525) >>> 0) % 101) / 100;
+    for (let y = 0; y < this.ny; y++) for (let x = 0; x < this.nx; x++) {
+      const bend = 0.08 * (1 - 2 * Math.abs(2 * ((y / this.ny + phase) % 1) - 1));
+      const u = (x + 0.5) / this.nx + bend;
+      const id = u < 1 / 3 ? 1 : u > 2 / 3 ? 2 : 0;
+      const c = y * this.nx + x;
+      this.biome[c] = id;
+      this.biomeTemperature[c] = [0, -0.4, 0.12][id];
+      this.biomeFertility[c] = [1, 0.6, 1.4][id];
+      this.biomeFoodB[c] = [1, 0.3, 1.8][id];
+      this.biomeSeason[c] = [1, 1.5, 0.5][id];
+    }
+  }
+
+  cellAt(x: number, y: number): number {
+    return Math.max(0, Math.min(this.ny - 1, Math.floor(y / this.cell))) * this.nx + Math.max(0, Math.min(this.nx - 1, Math.floor(x / this.cell)));
+  }
+
+  /** Seeded barriers with passages: no simulation RNG is consumed. */
+  generateObstacles(seed: number): void {
+    this.obstacles.fill(0);
+    for (let k = 1; k <= 2; k++) {
+      const x = Math.floor(this.nx * k / 3);
+      const passage = 1 + ((seed + k * 17) >>> 0) % Math.max(1, this.ny - 3);
+      for (let y = 1; y < this.ny - 1; y++) if (Math.abs(y - passage) > 1) this.obstacles[y * this.nx + x] = 1;
+    }
+  }
+
+  /** Amanatides-style grid ray traversal, including crossed cell corners. */
+  visible(x0: number, y0: number, x1: number, y1: number): boolean {
+    let cx = Math.max(0, Math.min(this.nx - 1, Math.floor(x0 / this.cell)));
+    let cy = Math.max(0, Math.min(this.ny - 1, Math.floor(y0 / this.cell)));
+    const tx = Math.max(0, Math.min(this.nx - 1, Math.floor(x1 / this.cell)));
+    const ty = Math.max(0, Math.min(this.ny - 1, Math.floor(y1 / this.cell)));
+    const dx = x1 - x0, dy = y1 - y0;
+    const sx = dx > 0 ? 1 : dx < 0 ? -1 : 0;
+    const sy = dy > 0 ? 1 : dy < 0 ? -1 : 0;
+    let mx = sx === 0 ? Infinity : (((cx + (sx > 0 ? 1 : 0)) * this.cell - x0) / dx);
+    let my = sy === 0 ? Infinity : (((cy + (sy > 0 ? 1 : 0)) * this.cell - y0) / dy);
+    const ddx = sx === 0 ? Infinity : this.cell / Math.abs(dx);
+    const ddy = sy === 0 ? Infinity : this.cell / Math.abs(dy);
+    for (let n = 0; n <= this.nx + this.ny; n++) {
+      if (this.obstacles[cy * this.nx + cx]) return false;
+      if (cx === tx && cy === ty) return true;
+      if (mx === my) {
+        if (sx && this.obstacles[cy * this.nx + cx + sx]) return false;
+        if (sy && this.obstacles[(cy + sy) * this.nx + cx]) return false;
+        cx += sx; cy += sy; mx += ddx; my += ddy;
+      } else if (mx < my) { cx += sx; mx += ddx; }
+      else { cy += sy; my += ddy; }
+      if (cx < 0 || cy < 0 || cx >= this.nx || cy >= this.ny) return false;
+    }
+    return false;
+  }
+
+  /** Reject contact with the obstacle's cell rectangle, including organism radius. */
+  blocked(x: number, y: number, radius = 0): boolean {
+    const cx = Math.floor(x / this.cell), cy = Math.floor(y / this.cell);
+    const reach = Math.ceil(radius / this.cell);
+    for (let yy = Math.max(0, cy - reach); yy <= Math.min(this.ny - 1, cy + reach); yy++)
+      for (let xx = Math.max(0, cx - reach); xx <= Math.min(this.nx - 1, cx + reach); xx++) {
+        if (!this.obstacles[yy * this.nx + xx]) continue;
+        const dx = Math.max(xx * this.cell - x, 0, x - (xx + 1) * this.cell);
+        const dy = Math.max(yy * this.cell - y, 0, y - (yy + 1) * this.cell);
+        if (dx * dx + dy * dy <= radius * radius) return true;
+      }
+    return false;
   }
 
   get cells(): number {

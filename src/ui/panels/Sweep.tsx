@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { PARAM_META, type WorldParams } from '../../engine/config';
 import { SWEEP_METRICS, sweepToCsv, type SweepResult } from '../../engine/experiment';
-import { ci95, welchTest } from '../../engine/statsutil';
+import { ci95, pairedSeedTest } from '../../engine/statsutil';
 import { downloadBytes } from '../../storage/db';
 import type { FromSeries, ToSeries } from '../../worker/protocol';
 import { manager, type WorldClient } from '../client';
@@ -296,7 +296,7 @@ export function AbTest({ client }: { client: WorldClient }) {
     const vb = sw.result.cells[0][1].map(get);
     const ca = ci95(va);
     const cb = ci95(vb);
-    const t = welchTest(va, vb);
+    const t = pairedSeedTest(sw.result.cells[0][0], sw.result.cells[0][1], get);
     const sig = t.p < 0.05;
     out = (
       <div className="kv">
@@ -320,8 +320,8 @@ export function AbTest({ client }: { client: WorldClient }) {
           {t.diff.toFixed(3)} <small>[{t.ciLo.toFixed(3)}; {t.ciHi.toFixed(3)}]</small>
         </b>
         <span>
-          Test Welcha
-          <Help id="welch" />
+          Test t sparowany
+          <Help id="paired" />
         </span>
         <b>
           t = {t.t.toFixed(2)}, df = {t.df.toFixed(1)}
@@ -346,7 +346,7 @@ export function AbTest({ client }: { client: WorldClient }) {
           Test A/B dwóch ustawień
           <Help id="ab" />
         </h4>
-        <span className="hint">ta sama pula seedów, test t Welcha</span>
+        <span className="hint">różnice w parach tych samych seedów</span>
       </header>
       <div className="form-grid">
         <label className="span2">

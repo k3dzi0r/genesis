@@ -105,7 +105,7 @@ export const ANALYSIS: HelpMap = {
     group: 'Analiza i statystyka',
     title: 'Wykres: drapieżnictwo',
     short: 'Czerwona: udział drapieżników (dieta > 0,3). Pomarańczowa: ile energii przejęły od ofiar na 1000 ticków.',
-    more: ['Jeśli udział drapieżników spada do zera, to koniec drapieżnictwa w tym świecie: bez nich nic nie podtrzymuje diety w genomie.'],
+    more: ['Spadek udziału do zera oznacza brak drapieżników w tym momencie. W pomiarze v0.3 nie powrócili do końca obserwacji, ale gen diety nadal mutuje; nie dowodzi to nieodwracalności.'],
     see: ['predation', 'absorbing'],
   },
   'chart.clades': {
@@ -183,9 +183,9 @@ export const ANALYSIS: HelpMap = {
   },
   strategies: {
     group: 'Analiza i statystyka',
-    title: 'Strategie w populacji (klastrowanie)',
+    title: 'Profile genetyczne (klastrowanie)',
     short: 'Algorytm k-średnich dzieli organizmy na 4 grupy o podobnych cechach. Etykiety wynikają z tego, czym grupa najbardziej odbiega od średniej populacji.',
-    more: ['Słupki pod nazwą to wartości cech grupy (kolejność jak w legendzie pod listą). Pomaga to zobaczyć, że „populacja” składa się z kilku sposobów życia, a nie z jednego typu.', 'Podział jest deterministyczny (zawsze ten sam dla tego samego stanu), ale nazwy to uproszczenie — to nie są gatunki.'],
+    more: ['Słupki pod nazwą to wartości cech grupy (kolejność jak w legendzie pod listą). Pokazuje różne zestawy cech; rzeczywiście wykonywane zachowania grupuje osobno Atlas.', 'Podział jest deterministyczny (zawsze ten sam dla tego samego stanu), ale nazwy to uproszczenie — to nie są gatunki.'],
     fun: 'Algorytm k-średnich zna się od lat 50. i 60. XX wieku; mimo prostoty nadal jest jednym z najczęściej używanych narzędzi grupowania danych.',
     see: ['niche', 'diversity'],
   },
@@ -225,7 +225,7 @@ export const ANALYSIS: HelpMap = {
     group: 'Analiza i statystyka',
     title: 'Wielokrotne porównania',
     short: 'Im więcej rzeczy porównujesz, tym większa szansa, że któraś wyjdzie „istotna” z samego przypadku.',
-    more: ['Test ablacji sprawdza 6 zmysłów × 2 miary = 12 porównań. Przy progu p = 0,05 szansa na choć jeden fałszywy alarm to ok. 46%; przy |z| ≥ 3 spada do ok. 3%. Dlatego w tabeli ablacji jaśniej świecą dopiero wiersze z |z| ≥ 3.'],
+    more: ['Test ablacji sprawdza 7 grup × 2 miary = 14 porównań. Więcej porównań zwiększa ryzyko fałszywego alarmu; próg |z| ≥ 3 jest orientacyjny i nie zastępuje korekty. Dlatego w tabeli ablacji jaśniej świecą dopiero wiersze z |z| ≥ 3.'],
     fun: 'Ten błąd bywa nazywany p-hackingiem, gdy jest (nie)świadomie wykorzystywany: przetestuj wystarczająco wiele hipotez, a któraś „wyjdzie”.',
     see: ['pvalue', 'zscore'],
   },
@@ -235,7 +235,7 @@ export const ANALYSIS: HelpMap = {
     short: 'Dwie wartości jednego parametru, każda uruchomiona na tych samych seedach. Wynik: różnica średnich, przedział ufności i wartość p.',
     more: ['To najprostszy eksperyment przyczynowy: zmieniasz jedną rzecz, resztę zostawiasz tak samo. Wybierz metrykę (np. liczbę drapieżników, różnorodność), parametr i dwie wartości, a aplikacja policzy wszystko w osobnym wątku.'],
     try: 'Parametr „Siła ataku drapieżników”: A = 0, B = 4; metryka „Populacja końcowa”.',
-    see: ['welch', 'ci95', 'twin'],
+    see: ['paired', 'ci95', 'twin'],
   },
   paramsweep: {
     group: 'Analiza i statystyka',

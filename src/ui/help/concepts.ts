@@ -270,12 +270,12 @@ export const CONCEPTS: HelpMap = {
   genome: {
     group: 'Organizm',
     title: 'Genom',
-    short: '218 liczb dziedziczonych po rodzicach: 11 cech fizycznych i 207 wag sieci neuronowej. To jedyne, co przechodzi na potomstwo.',
+    short: '289 liczb dziedziczonych po rodzicach: 16 cech fizycznych i 273 wag sieci neuronowej. To jedyne, co przechodzi na potomstwo.',
     more: [
       'Cechy mają wartości 0–1 i są przeliczane na wielkości fizyczne (np. gen rozmiaru 0,5 to promień 4). Wagi decydują o tym, jak mózg zamienia zmysły na działanie.',
       'Pasek genomu w karcie organizmu to jeden kolorowy prostokąt na gen: pierwsze to cechy, dalej wagi (turkus = dodatnia, czerwień = ujemna). W porównaniu z przodkiem żółta ramka oznacza gen, który się zmienił.',
     ],
-    fun: 'Genom człowieka ma ok. 3 miliardy par zasad. Ten tutaj — 218 liczb. Mimo to wystarcza, by dobór naturalny wykształcił skręt w stronę pokarmu.',
+    fun: 'Genom człowieka ma ok. 3 miliardy par zasad. Ten tutaj — 289 liczb. Mimo to wystarcza, by dobór naturalny wykształcił skręt w stronę pokarmu.',
     see: ['mutation', 'brain', 'inheritance'],
   },
   inheritance: {
@@ -382,7 +382,7 @@ export const CONCEPTS: HelpMap = {
     short: 'Dwoje rodziców, rekombinacja genów. Potomek dostaje po neuronie ukrytym od jednego lub drugiego rodzica, a cechy — losowo od któregokolwiek.',
     more: [
       'Rekombinacja tasuje geny — dobra mutacja z jednego organizmu może spotkać się z dobrą mutacją z innego. W rozmnażaniu bezpłciowym, gdzie cały genom dziedziczy się razem, takie połączenie jest trudne.',
-      'W GENESIS partner to najbliższy gotowy do rozrodu organizm w zasięgu. Każdy może być rodzicem raz na tick. Obaj rodzice płacą po połowie kosztu.',
+      'W GENESIS partner to najbliższy gotowy organizm, którego zaakceptują obaj rodzice przy włączonym wyborze partnera. Każdy może być rodzicem raz na tick. Obaj rodzice płacą po połowie kosztu.',
     ],
     fun: 'Biolodzy mówią o „podwójnym koszcie płci” (John Maynard Smith, 1978): organizmy płciowe wytwarzają dwa razy mniej potomstwa na osobnika niż klonujące się. W GENESIS obie „płci” są hermafrodytami, więc tego kosztu nie ma — ale też partner trzeba znaleźć.',
     try: 'Scenariusz „Rozmnażanie płciowe” — sprawdź wykres liczby kladów i różnorodności.',
@@ -401,12 +401,12 @@ export const CONCEPTS: HelpMap = {
   brain: {
     group: 'Mózg',
     title: 'Sieć neuronowa (mózg)',
-    short: 'Mała sieć 17 → 8 → 7: 17 wejść (zmysły i pamięć), 8 neuronów ukrytych, 7 wyjść (skręt, ciąg, jedzenie, atak, 3 zapisy pamięci). Nikt jej nie uczy.',
+    short: 'Mała sieć 23 → 8 → 9: zmysły dwóch pokarmów, sąsiadów, sygnału i pamięci sterują ruchem, jedzeniem, atakiem, emisją i kultywacją. Plastyczność może zmieniać wagi w życiu organizmu.',
     more: [
       'Sieć liczy wszystko od nowa co tick: każdy neuron sumuje wejścia pomnożone przez wagi, dodaje bias i przepuszcza przez funkcję tanh, która ściska wynik do −1…1.',
-      'Zachowanie wynika wyłącznie z wag odziedziczonych po rodzicach i zmutowanych. Jeśli organizm skręca w stronę pokarmu, to dlatego, że przodkowie z takimi wagami mieli więcej potomstwa.',
+      'Zachowanie wynika z odziedziczonych wag oraz ewentualnych zmian somatycznych; geny i pamięć mają oddzielny zapis. Jeśli organizm skręca w stronę pokarmu, to dlatego, że przodkowie z takimi wagami mieli więcej potomstwa.',
     ],
-    fun: 'Nicień C. elegans ma 302 neurony i potrafi wędrować w stronę zapachu pokarmu. Sieć GENESIS ma 15 neuronów, a mimo to ewoluuje podobne odruchy.',
+    fun: 'Nicień C. elegans ma 302 neurony i potrafi wędrować w stronę zapachu pokarmu. Sieć GENESIS ma 17 neuronów, a mimo to ewoluuje podobne odruchy.',
     try: 'W karcie organizmu włącz pauzę i patrz, jak jaśnieją węzły sieci, gdy organizm znajduje pokarm.',
     see: ['neuron', 'brain.diagram', 'notraining', 'memory'],
   },
@@ -428,9 +428,9 @@ export const CONCEPTS: HelpMap = {
   inputs: {
     group: 'Mózg',
     title: 'Wejścia sieci (zmysły)',
-    short: 'Energia własna, kierunek i ilość pokarmu, pokarm pod sobą, tłok, najbliższy sąsiad (kierunek, rozmiar, dieta), ściany, temperatura i 3 komórki pamięci.',
+    short: 'Energia, dwa pokarmy, widoczni sąsiedzi, ściany, temperatura, trzy komórki pamięci i lokalny sygnał. Pole widzenia i bariery mogą ograniczać odczyt wzrokowy.',
     more: [
-      'Wszystko jest egocentryczne: „przód” i „lewo” liczone względem kierunku, w którym organizm patrzy. Kierunek do pokarmu to ważony środek ciężkości pokarmu w zasięgu — organizm nie widzi pojedynczych „obiektów”.',
+      'Wszystko jest egocentryczne: „przód” i „lewo” liczone względem kierunku, w którym organizm patrzy. Kierunek każdego pokarmu to agregat widocznych komórek w zasięgu. Obrót i przeszkody zmieniają odczyt; sensory nadal nie rozpoznają pojedynczych obiektów.',
       'Rozmiar i dieta najbliższego sąsiada pozwalają, ale nie zmuszają, odróżnić potencjalnego drapieżnika od ofiary.',
     ],
     see: ['egocentric', 'trait.sense', 'brain'],
@@ -438,7 +438,7 @@ export const CONCEPTS: HelpMap = {
   outputs: {
     group: 'Mózg',
     title: 'Wyjścia sieci (działania)',
-    short: 'Skręt, ciąg (jak szybko ruszać), wysiłek jedzenia, wysiłek ataku oraz trzy zapisy do pamięci.',
+    short: 'Skręt, ciąg, wysiłek jedzenia i ataku, trzy zapisy pamięci, podpisana emisja sygnału oraz wysiłek kultywacji.',
     more: ['Jedzenie i atak kosztują energię proporcjonalnie do wysiłku, więc sieć opłaca się „wyłączać” w pustce i włączać przy pokarmie lub ofierze. Atak działa tylko u organizmów z dietą powyżej progu.'],
     see: ['brain', 'trait.diet', 'predation'],
   },
@@ -464,8 +464,8 @@ export const CONCEPTS: HelpMap = {
   notraining: {
     group: 'Mózg',
     title: 'Ewolucja zamiast uczenia',
-    short: 'Sieć nie jest trenowana (brak wstecznej propagacji). Wagi zmieniają się tylko przez mutacje przy narodzinach, a „uczy” je dobór naturalny.',
-    more: ['To podejście nazywa się neuroewolucją. Jest wolniejsze od uczenia gradientowego, ale nie potrzebuje funkcji celu — wystarczy, że organizm przeżyje i się rozmnoży.'],
+    short: 'Genom ewoluuje przez dziedziczenie, mutacje i rekombinację. Przy włączonej plastyczności efektywne wagi dodatkowo zmieniają się podczas życia, bez wstecznej propagacji.',
+    more: ['To podejście nazywa się neuroewolucją. Dziedziczny sukces zależy od rozrodu; somatyczne uczenie wykorzystuje zmianę własnej energii. Nauczone wagi nie przechodzą na potomstwo.'],
     fun: 'Karl Sims w 1994 r. wyewoluował wirtualne stworzenia, które same nauczyły się pływać, chodzić i ścigać o sześcian — bez ręcznie napisanych zachowań. To był jeden z pierwszych głośnych pokazów neuroewolucji i ewolucji morfologii.',
     see: ['brain', 'fitness', 'evolution'],
   },
@@ -497,7 +497,7 @@ export const CONCEPTS: HelpMap = {
     group: 'Ewolucja',
     title: 'Mutacja',
     short: 'Przy narodzinach każdy gen z niewielkim prawdopodobieństwem (domyślnie 4%) zmienia się o losową wartość. Mutacje są jedynym źródłem nowej zmienności.',
-    more: ['Przy 218 genach noworodek ma średnio ok. 9 zmian. Większość jest szkodliwa lub obojętna, rzadko któraś pomaga — i to ona rozprzestrzenia się dzięki dobremu rozmnażaniu.', 'Każda zmiana jest zapisywana w rejestrze mutacji i widoczna w genealogii.'],
+    more: ['Przy 289 genach i mutacji 0,04 noworodek ma średnio ok. 12 zmian. Większość jest szkodliwa lub obojętna, rzadko któraś pomaga — i to ona rozprzestrzenia się dzięki dobremu rozmnażaniu.', 'Każda zmiana jest zapisywana w rejestrze mutacji i widoczna w genealogii.'],
     fun: 'U człowieka każde dziecko ma ok. 50–100 nowych mutacji (w porównaniu z genomami rodziców).',
     try: 'Ustaw częstość mutacji na 0 w jednym ze światów-bliźniaków i porównaj różnorodność.',
     see: ['param.mutationRate', 'param.mutationStrength', 'selection', 'drift'],
@@ -574,7 +574,7 @@ export const CONCEPTS: HelpMap = {
   genomedist: {
     group: 'Ewolucja',
     title: 'Odległość genomów',
-    short: 'Średnia (RMS) różnica między genomami losowo dobranych par organizmów, liczona po wszystkich 218 genach.',
+    short: 'Średnia (RMS) różnica między genomami losowo dobranych par organizmów, liczona po wszystkich 289 genach.',
     see: ['diversity'],
   },
   niche: {
@@ -611,8 +611,8 @@ export const CONCEPTS: HelpMap = {
   absorbing: {
     group: 'Ewolucja',
     title: 'Stan pochłaniający',
-    short: 'Sytuacja, z której system już nie wraca: raz osiągnięta, trwa. Przykład w GENESIS: wymarcie drapieżników.',
-    more: ['W jednym z przebiegów na milion ticków (seed 5) drapieżnicy wymarli między 700 a 900 tys. ticków. Potem gen diety spadł do zera i nic nie przywróciło zdolności ataku, a populacja zbiegła do małych, prawie ślepych roślinożerców.'],
+    short: 'Sytuacja, z której system już nie wraca. Wymarcie całej populacji jest takie; brak drapieżników nie jest formalnie nieodwracalny, ponieważ gen diety nadal mutuje.',
+    more: ['W jednym z przebiegów na milion ticków (seed 5) drapieżnicy wymarli między 700 a 900 tys. ticków. Potem gen diety spadł do zera i w obserwowanym przebiegu zdolność ataku nie powróciła, a populacja zbiegła do małych, prawie ślepych roślinożerców.'],
     see: ['arms', 'exclusion'],
   },
   emergence: {

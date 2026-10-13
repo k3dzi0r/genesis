@@ -16,10 +16,17 @@ import { ExperimentPanel, SavesPanel } from './panels/Experiment';
 import { Genealogy } from './panels/Genealogy';
 import { Inspector } from './panels/Inspector';
 import { LogPanel } from './panels/Log';
+import { HistoryPanel } from './panels/HistoryPanel';
+import { AtlasPanel } from './panels/AtlasPanel';
+import { LabPanel } from './panels/LabPanel';
 import { StatsPanel } from './panels/Stats';
+import { ModulePanel } from './panels/ModulePanel';
+import { BiomesPanel } from './panels/BiomesPanel';
+import { PresentationPanel, readPresentation, type Presentation, type ToolTab } from './panels/PresentationPanel';
+import type { GuidedSession } from './panels/GuidedLesson';
 
-type LeftTab = 'env' | 'exp' | 'saves';
-type RightTab = 'stats' | 'org' | 'gen' | 'cmp' | 'log' | 'learn';
+type LeftTab = 'modules' | 'env' | 'view' | 'exp' | 'saves';
+type RightTab = ToolTab;
 
 const SPEEDS: { label: string; tps: number }[] = [
   { label: '1×', tps: 30 },
@@ -52,21 +59,22 @@ function Toolbar({ client }: { client: WorldClient }) {
   const info = client.info;
   const playing = info?.playing ?? false;
   const extinct = info?.status === 'extinct';
+  const preview = client.history?.preview ?? false;
   return (
     <div className="toolbar">
-      <button className={`btn play ${playing ? 'on' : ''}`} disabled={extinct} onClick={() => client.play(!playing)} title="Start / pauza (spacja)">
+      <button className={`btn play ${playing ? 'on' : ''}`} disabled={extinct || preview} onClick={() => client.play(!playing)} title="Start / pauza (spacja)">
         {playing ? '❚❚ Pauza' : '▶ Start'}
       </button>
       <Help id="play" className="tb-help" />
-      <button className="btn" disabled={extinct} onClick={() => client.step(1)} title="Jeden tick (.)">
+      <button className="btn" disabled={extinct || preview} onClick={() => client.step(1)} title="Jeden tick (.)">
         ⏭ Krok
       </button>
-      <button className="btn" disabled={extinct} onClick={() => client.step(100)} title="100 ticków">
+      <button className="btn" disabled={extinct || preview} onClick={() => client.step(100)} title="100 ticków">
         +100
       </button>
       <div className="seg" title="Tempo symulacji (klawisze 1–5)">
         {SPEEDS.map((s) => (
-          <button key={s.label} className={client.speedLabel === s.label ? 'on' : ''} onClick={() => client.setSpeed(s.tps, s.label)}>
+          <button key={s.label} disabled={preview} className={client.speedLabel === s.label ? 'on' : ''} onClick={() => client.setSpeed(s.tps, s.label)}>
             {s.label}
           </button>
         ))}
@@ -92,6 +100,7 @@ function Toolbar({ client }: { client: WorldClient }) {
           <b>{info.activeEvents.map((a) => a.spec.kind).join(', ')}</b>
         </div>
       )}
+      {preview && <div className="readout warn"><b>PODGLĄD HISTORII</b><button className="btn sm" onClick={() => void client.historyLive()}>Wróć do teraz</button></div>}
       {extinct && <div className="readout bad"><b>WYMARCIE</b></div>}
     </div>
   );
@@ -100,7 +109,7 @@ function Toolbar({ client }: { client: WorldClient }) {
 export function App() {
   const m = useManager();
   const active = m.active;
-  const [left, setLeft] = useState<LeftTab>('env');
+  const [left, setLeft] = useState<LeftTab>('modules');
   const [right, setRight] = useState<RightTab>('stats');
   const wide = typeof window !== 'undefined' && window.innerWidth >= 1180;
   const [leftOpen, setLeftOpen] = useState(wide);
@@ -110,19 +119,27 @@ export function App() {
   const [learnTab, setLearnTab] = useState<LearnTab>('start');
   const [glossaryFocus, setGlossaryFocus] = useState<string | null>(null);
   const [lessonFocus, setLessonFocus] = useState<string | null>(null);
+  const [presentation, setPresentation] = useState<Presentation>(readPresentation);
+  const [guided, setGuided] = useState<GuidedSession | null>(null);
+  const showTool = (tab: RightTab) => setPresentation(value => value.tabs.includes(tab) ? value : { ...value, tabs: [...value.tabs, tab] });
+  useEffect(() => { try { localStorage.setItem('genesis-presentation-v1', JSON.stringify(presentation)); } catch { /* optional preferences */ } if (!presentation.tabs.includes(right)) setRight('stats'); }, [presentation, right]);
 
-  const runLesson = (l: Lesson) => {
+  const runLesson = (l: Lesson, seed = 1) => {
     const a = l.action;
     let last: ReturnType<typeof manager.create> | null = null;
+    const ids: string[] = [];
     for (const w of a.worlds) {
-      last = manager.create((w.setup ?? {}) as Partial<WorldSetup>, (w.params ?? {}) as Partial<WorldParams>, w.name);
+      last = manager.create({ ...(w.setup ?? {}) as Partial<WorldSetup>, ...(l.guided ? { seed } : {}) }, (w.params ?? {}) as Partial<WorldParams>, w.name);
+      ids.push(last.id);
       if (a.speed) last.setSpeed(a.speed.tps, a.speed.label);
     }
+    if (l.guided) { setGuided({lesson:l, ids:ids as [string,string], seed}); setRightOpen(true); setRight('learn'); setLearnTab('lessons'); setLessonFocus(l.id); }
     if (a.openLeft) {
       setLeftOpen(true);
       setLeft(a.openLeft);
     }
     if (a.openTab) {
+      showTool(a.openTab);
       setRightOpen(true);
       setRight(a.openTab);
     }
@@ -143,6 +160,7 @@ export function App() {
         if (r.lessonId) setLessonFocus(r.lessonId);
       } else if (r.type === 'tab') {
         if (r.side === 'right') {
+          showTool(r.tab as RightTab);
           setRightOpen(true);
           setRight(r.tab as RightTab);
         } else {
@@ -155,7 +173,7 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    if (booted) return;
+    if (booted || manager.worlds.length > 0) return;
     booted = true;
     manager.create({}, {});
     void listSaves().then((all) => {
@@ -177,6 +195,7 @@ export function App() {
       if (t.tagName === 'INPUT' || t.tagName === 'SELECT' || t.tagName === 'TEXTAREA') return;
       const a = manager.active;
       if (!a) return;
+      if (a.history?.preview && (e.code === 'Space' || e.key === '.' || (e.key >= '1' && e.key <= '5'))) { e.preventDefault(); return; }
       if (e.code === 'Space') {
         e.preventDefault();
         a.play(!(a.info?.playing ?? false));
@@ -238,10 +257,14 @@ export function App() {
 
       <aside className="side left">
         <div className="tabs">
+          {lt('modules', 'Moduły')}
           {lt('env', 'Środowisko')}
+          {lt('view', 'Widok')}
           {lt('exp', 'Eksperyment')}
           {lt('saves', 'Zapisy')}
         </div>
+        {active && left === 'modules' && <ModulePanel client={active} />}
+        {left === 'view' && <PresentationPanel value={presentation} onChange={setPresentation} />}
         {active && left === 'env' && <Controls client={active} />}
         {active && left === 'exp' && <ExperimentPanel client={active} />}
         {active && left === 'saves' && <SavesPanel client={active} />}
@@ -281,19 +304,27 @@ export function App() {
 
       <aside className="side right">
         <div className="tabs">
+          {presentation.tabs.includes('history') && rt('history', 'Historia')}
+          {presentation.tabs.includes('atlas') && rt('atlas', 'Atlas')}
+          {presentation.tabs.includes('lab') && rt('lab', 'Laboratorium')}
           {rt('stats', 'Statystyki')}
           {rt('org', 'Organizm')}
-          {rt('gen', 'Genealogia')}
-          {rt('cmp', 'Porównanie')}
-          {rt('log', 'Dziennik')}
+          {presentation.tabs.includes('biomes') && rt('biomes', 'Biomy')}
+          {presentation.tabs.includes('gen') && rt('gen', 'Genealogia')}
+          {presentation.tabs.includes('cmp') && rt('cmp', 'Porównanie')}
+          {presentation.tabs.includes('log') && rt('log', 'Dziennik')}
           {rt('learn', 'Nauka')}
         </div>
+        {active && right === 'biomes' && <BiomesPanel client={active} />}
+        {active && right === 'history' && <HistoryPanel client={active} />}
+        {active && right === 'atlas' && <AtlasPanel client={active} />}
+        {active && right === 'lab' && <LabPanel client={active} />}
         {active && right === 'stats' && <StatsPanel client={active} />}
-        {active && right === 'org' && <Inspector client={active} goGenealogy={() => setRight('gen')} />}
+        {active && right === 'org' && <Inspector client={active} goGenealogy={() => { showTool('gen'); setRight('gen'); }} goAtlas={() => { showTool('atlas'); setRight('atlas'); }} goLab={() => { showTool('lab'); setRight('lab'); }} />}
         {active && right === 'gen' && <Genealogy client={active} />}
         {right === 'cmp' && <ComparePanel />}
         {active && right === 'log' && <LogPanel client={active} />}
-        {right === 'learn' && <LearnPanel tab={learnTab} onTab={setLearnTab} focus={glossaryFocus} lessonFocus={lessonFocus} onRunLesson={runLesson} />}
+        {right === 'learn' && <LearnPanel tab={learnTab} onTab={setLearnTab} focus={glossaryFocus} lessonFocus={lessonFocus} onRunLesson={runLesson} guided={guided} />}
       </aside>
 
       <HelpPopover />

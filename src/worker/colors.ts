@@ -44,6 +44,8 @@ export interface ColorInput {
   clade: number;
   age: number;
   maxAge: number;
+  signal?: number;
+  specialization?: number;
 }
 
 export function colorOf(c: ColorInput): number {
@@ -61,6 +63,14 @@ export function colorOf(c: ColorInput): number {
     case 'diet':
       // roślinożercy: zielony → drapieżnicy: czerwony
       return pack(Math.round(60 + 195 * c.diet), Math.round(220 - 150 * c.diet), Math.round(110 - 60 * c.diet));
+    case 'signal': {
+      const amplitude = Math.min(1, Math.abs(c.signal ?? 0));
+      return (c.signal ?? 0) >= 0 ? pack(40, Math.round(65 + 145 * amplitude), Math.round(80 + 175 * amplitude)) : pack(Math.round(80 + 175 * amplitude), 65, Math.round(80 + 120 * amplitude));
+    }
+    case 'specialization': {
+      const t = c.specialization ?? 0.5;
+      return pack(Math.round(40 + 205 * t), Math.round(205 - 45 * t), Math.round(180 - 120 * t));
+    }
     case 'clade':
       // stały „losowy” kolor kladu (złoty podział w przestrzeni barw)
       return hsl((c.clade * 0.6180339887) % 1, 0.7, 0.58);

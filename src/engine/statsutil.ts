@@ -134,3 +134,27 @@ export function welchTest(a: ArrayLike<number>, b: ArrayLike<number>): WelchResu
   const h = tQuantile975(df) * se;
   return { meanA: ma, meanB: mb, diff, t, df, p, ciLo: diff - h, ciHi: diff + h };
 }
+
+/** Paired conditions: uncertainty is measured across within-seed differences. */
+export function pairedTest(a: ArrayLike<number>, b: ArrayLike<number>): WelchResult {
+  if (a.length !== b.length || a.length < 2) throw new Error('Test sparowany wymaga co najmniej dwóch równolicznych par.');
+  const differences = Array.from({ length: a.length }, (_, i) => {
+    if (!Number.isFinite(a[i]) || !Number.isFinite(b[i])) throw new Error('Wyniki testu muszą być skończonymi liczbami.');
+    return b[i] - a[i];
+  });
+  const diff = mean(differences);
+  const se = sd(differences) / Math.sqrt(differences.length);
+  const df = differences.length - 1;
+  const t = se ? diff / se : diff === 0 ? 0 : Math.sign(diff) * Infinity;
+  const h = tQuantile975(df) * se;
+  return { meanA: mean(a), meanB: mean(b), diff, t, df, p: se ? Math.max(0, 2 * (1 - tCdf(Math.abs(t), df))) : diff === 0 ? 1 : 0, ciLo: diff - h, ciHi: diff + h };
+}
+
+/** Align by seed, rejecting accidental duplicates or a mismatched experimental design. */
+export function pairedSeedTest<T extends { seed: number }>(a: readonly T[], b: readonly T[], value: (row: T) => number): WelchResult {
+  const bySeed = new Map(b.map((row) => [row.seed, row]));
+  if (bySeed.size !== b.length || new Set(a.map((row) => row.seed)).size !== a.length || a.length !== b.length || a.some((row) => !bySeed.has(row.seed))) {
+    throw new Error('Warunki A i B muszą zawierać te same, unikalne seedy.');
+  }
+  return pairedTest(a.map(value), a.map((row) => value(bySeed.get(row.seed)!)));
+}

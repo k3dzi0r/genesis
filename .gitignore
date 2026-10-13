@@ -7,3 +7,4 @@ runs/
 .claude/
 .vscode/
 coverage/
+graphify-out/

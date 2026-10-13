@@ -4,7 +4,10 @@
  * Czas symulacji (ticki) jest niezależny od FPS — worker wykonuje tyle ticków, ile wynika z wybranego tempa.
  */
 import { World, ledgerIn, ledgerOut, type Command } from '../engine/world';
-import { ENGINE_VERSION, GENOME_LEN, N_TRAITS, TRAIT_DIET, TRAIT_HUE } from '../engine/constants';
+import { WorldHistory, validCommand } from '../engine/history';
+import { behaviorAtlas, speciesAnalysis, captureSpecimen, captureAncestorSpecimen } from '../engine/behavior';
+import { runLabGenerator, type LabRequest } from '../engine/lab';
+import { ENGINE_VERSION, GENOME_LEN, N_TRAITS, TRAIT_DIET, TRAIT_HUE, TRAIT_PLANT } from '../engine/constants';
 import { N_STATS } from '../engine/stats';
 import { deserializeWorld, gzip, serializeWorld } from '../engine/serialize';
 import { exportExperimentJson, exportLineageJson, exportPopulationCsv } from '../engine/experiment';
@@ -16,6 +19,7 @@ import type { CompareResult, FromWorker, LineageResult, LineageTreeNode, ToWorke
 const ctx = self as unknown as DedicatedWorkerGlobalScope;
 
 let world: World | null = null;
+let history: WorldHistory | null = null;
 let playing = false;
 let tps = 30;
 let acked = true;
@@ -84,6 +88,7 @@ function buildFrame(): void {
     u32[o + 5] = colorOf({
       mode: flags.colorMode, hue: p.genomes[g + TRAIT_HUE], speed: p.genomes[g + 1], sense: p.genomes[g + 2], size: p.genomes[g],
       energyFrac: ef, generation: p.generation[i], maxGeneration: maxGen, age: p.age[i], maxAge: p.maxAge[i], diet: p.genomes[g + TRAIT_DIET], clade: p.clade[i],
+      signal: p.signal[i], specialization: p.genomes[g + TRAIT_PLANT],
     });
     data[o + 6] = ef;
     data[o + 7] = p.senseRange[i];
@@ -93,12 +98,21 @@ function buildFrame(): void {
   }
   const grid = w.grid;
   const food = new Uint8Array(grid.cells);
+  const foodB = new Uint8Array(grid.cells);
+  const obstacles = grid.obstacles.slice();
+  const niche = new Uint8Array(grid.cells);
+  const signals = p.signal.slice(0, n);
+  const biome = grid.biome.slice();
+  const localTemperature = new Float32Array(grid.cells);
   const inv = 255 / w.params.foodCapMax;
   for (let c = 0; c < grid.cells; c++) {
+    localTemperature[c] = w.localTemperature(c);
     const v = grid.food[c] * inv;
     food[c] = v > 255 ? 255 : v;
+    foodB[c] = Math.min(255, grid.foodB[c] * inv);
+    niche[c] = Math.round(Math.min(1, Math.max(0, grid.niche[c])) * 255);
   }
-  const transfer: Transferable[] = [data.buffer, ids.buffer, food.buffer];
+  const transfer: Transferable[] = [data.buffer, ids.buffer, food.buffer, foodB.buffer, obstacles.buffer, niche.buffer, signals.buffer, biome.buffer, localTemperature.buffer];
   let fert: Uint8Array | undefined;
   if (w.fertVersion !== fertSent) {
     fert = new Uint8Array(grid.cells);
@@ -106,7 +120,7 @@ function buildFrame(): void {
     transfer.push(fert.buffer);
     fertSent = w.fertVersion;
   }
-  post({ t: 'frame', tick: w.tick, n, data, ids, food, fert, selected }, transfer);
+  post({ t: 'frame', tick: w.tick, n, data, ids, food, foodB, obstacles, niche, signals, biome, localTemperature, fert, selected }, transfer);
   acked = false;
   dirty = false;
 }
@@ -124,6 +138,7 @@ function sendStatus(): void {
     measuredTps,
     temperature: w.temperature,
     growthMult: w.growthMult,
+    biomes: w.biomeSnapshot(),
     activeEvents: w.activeEvents,
     eventLog: w.eventLog.slice(-150),
     eventLogTotal: w.eventLog.length,
@@ -136,6 +151,7 @@ function sendStatus(): void {
     lineageRecorded: w.lineage.totalRecorded,
     lineagePruned: w.lineage.totalPruned,
     lineageBytes: w.lineage.memoryBytes(),
+    history: history!.info,
   });
 }
 
@@ -152,25 +168,25 @@ function sendStats(force = false): void {
 }
 
 function runChunk(k: number): void {
-  const w = world!;
   const t0 = performance.now();
-  w.run(k);
+  history!.run(k);
   const dt = performance.now() - t0;
   msPerTick = 0.9 * msPerTick + 0.1 * (dt / Math.max(1, k));
 }
 
 async function doAutosave(): Promise<void> {
-  const w = world!;
+  const w = history!.live;
   lastAutosaveTick = w.tick;
-  const raw = serializeWorld(w, `autozapis @${w.tick}`);
+  const meta = { label: `autozapis @${w.tick}`, tick: w.tick, pop: w.pool.n, seed: w.setup.seed };
+  const raw = serializeWorld(w, meta.label);
   const bytes = await gzip(raw);
-  post({ t: 'saved', req: 0, reason: 'auto', label: `autozapis @${w.tick}`, bytes, tick: w.tick, pop: w.pool.n, seed: w.setup.seed, engine: ENGINE_VERSION }, [bytes.buffer as ArrayBuffer]);
+  post({ t: 'saved', req: 0, reason: 'auto', ...meta, bytes, engine: ENGINE_VERSION }, [bytes.buffer as ArrayBuffer]);
 }
 
 function tick(): void {
   const now = performance.now();
   if (world) {
-    if (playing && world.status === 'running') {
+    if (playing && !history?.preview && world.status === 'running') {
       const dtSec = Math.min(0.1, (now - lastT) / 1000);
       const start = performance.now();
       if (tps >= 1e8) {
@@ -187,7 +203,7 @@ function tick(): void {
       }
       dirty = true;
       if (world.status !== 'running') playing = false;
-      if (autosaveEvery > 0 && world.tick - lastAutosaveTick >= autosaveEvery) void doAutosave();
+      if (autosaveEvery > 0 && world.tick - lastAutosaveTick >= autosaveEvery) void doAutosave().catch(e => post({ t: 'error', message: e instanceof Error ? e.message : String(e) }));
     } else owed = 0;
     lastT = now;
 
@@ -214,7 +230,7 @@ function tick(): void {
 
 function applyCommand(cmd: Command): void {
   if (!world) return;
-  world.applyCommand(cmd);
+  history!.command(cmd);
   dirty = true;
   lastStatusT = 0;
 }
@@ -273,16 +289,49 @@ function compareQuery(aId: number, bId: number, req: number): CompareResult {
   return { t: 'compare', req, a: toNode(a), b: toNode(b), traitDelta, traitDistance: d.traits, weightDistance: d.weights, mutationsBetween, generationsBetween, changedWeights: changed.slice(0, 14), genomeA: ga, genomeB: gb };
 }
 
+function refreshHistorical(w: World): void {
+  world = w; selectedId = history!.info.selectedId;
+  statsVersion = -1; statsSent = 0; fertSent = -1; dirty = true;
+  lastStatusT = 0; lastStatsT = 0;
+  winTick = w.tick; winT = performance.now(); measuredTps = 0;
+  sendStatus(); sendStats(true);
+}
+
+let labRun: { req: number; cancelled: boolean } | null = null;
+function cancelLaboratory(): void { if (labRun) labRun.cancelled = true; }
+async function runLaboratory(req: number, request: LabRequest): Promise<void> {
+  if (labRun && !labRun.cancelled) { post({ t: 'error', req, message: 'Próba laboratoryjna już trwa.' }); return; }
+  const run = { req, cancelled: false };
+  labRun = run;
+  const generator = runLabGenerator(request);
+  try {
+    for (;;) {
+      if (run.cancelled) { post({ t: 'error', req, code: 'cancelled', message: 'Anulowano próbę laboratoryjną.' }); return; }
+      const next = generator.next();
+      if (next.done) { post({ t: 'lab', req, result: next.value }); return; }
+      post({ t: 'labProgress', req, ...next.value });
+      await new Promise<void>(resolve => setTimeout(resolve, 0));
+    }
+  } catch (e) {
+    post({ t: 'error', req, message: e instanceof Error ? e.message : String(e) });
+  } finally {
+    generator.return(undefined as never);
+    if (labRun === run) labRun = null;
+  }
+}
+
 let ablating = false;
 
 /** Test ablacji w tle: grupy liczone kolejno, między nimi oddajemy sterowanie pętli symulacji. */
 async function runAblation(req: number, ticks: number): Promise<void> {
-  if (!world || ablating) return;
+  if (!world || ablating) { post({ t: 'error', req, message: 'Świat nie jest gotowy lub trwa inny test ablacji.' }); return; }
   ablating = true;
   try {
     const w = world;
     const suite = ablationSuite(w, ticks, undefined, (row, done, total) => post({ t: 'ablationRow', req, row, done, total }));
     post({ t: 'ablationDone', req, suite });
+  } catch (e) {
+    post({ t: 'error', req, message: e instanceof Error ? e.message : String(e) });
   } finally {
     ablating = false;
   }
@@ -291,20 +340,60 @@ async function runAblation(req: number, ticks: number): Promise<void> {
 ctx.onmessage = (ev: MessageEvent<ToWorker>) => {
   const m = ev.data;
   try {
+    if ('req' in m && !world && m.t !== 'loadHistory' && m.t !== 'cancelLab') throw new Error('Świat nie jest gotowy.');
     switch (m.t) {
       case 'init':
+        cancelLaboratory();
         world = new World(m.setup, m.params);
+        history = new WorldHistory(world);
         selectedId = null;
         playing = false;
         announce();
         break;
       case 'load':
+        cancelLaboratory();
         world = deserializeWorld(m.bytes);
+        history = new WorldHistory(world);
         selectedId = null;
         playing = false;
         announce();
         break;
+      case 'loadHistory': {
+        cancelLaboratory();
+        history = WorldHistory.fromArchive(m.bytes);
+        world = history.live;
+        selectedId = history.info.selectedId;
+        playing = false; owed = 0;
+        announce();
+        post({ t: 'history', req: m.req, info: history.info });
+        break;
+      }
+      case 'historySeek':
+        if (!history) throw new Error('Świat nie jest gotowy.');
+        playing = false; owed = 0;
+        refreshHistorical(history.seek(m.tick));
+        post({ t: 'history', req: m.req, info: history.info });
+        break;
+      case 'historyLive':
+        if (!history) throw new Error('Świat nie jest gotowy.');
+        playing = false; owed = 0;
+        refreshHistorical(history.returnLive());
+        post({ t: 'history', req: m.req, info: history.info });
+        break;
+      case 'historyExport': {
+        if (!history) throw new Error('Świat nie jest gotowy.');
+        const raw = history.serializeArchive();
+        void gzip(raw).then(bytes => post({ t: 'historyBytes', req: m.req, kind: 'archive', bytes }, [bytes.buffer as ArrayBuffer])).catch(e => post({ t: 'error', req: m.req, message: String(e) }));
+        break;
+      }
+      case 'historicalWorld': {
+        if (!history) throw new Error('Świat nie jest gotowy.');
+        const bytes = serializeWorld(history.worldAt(m.tick));
+        post({ t: 'historyBytes', req: m.req, kind: 'world', bytes }, [bytes.buffer as ArrayBuffer]);
+        break;
+      }
       case 'play':
+        if (m.playing && history?.preview) throw new Error('Wróć do teraźniejszości lub rozwidl wybrany moment przed uruchomieniem.');
         playing = m.playing && !!world && world.status === 'running';
         lastT = performance.now();
         dirty = true;
@@ -313,7 +402,7 @@ ctx.onmessage = (ev: MessageEvent<ToWorker>) => {
       case 'step':
         if (world) {
           playing = false;
-          world.run(Math.max(1, Math.min(100000, Math.floor(m.n))));
+          history!.run(Math.max(1, Math.min(100000, Math.floor(m.n))));
           dirty = true;
           lastStatusT = 0;
         }
@@ -325,9 +414,17 @@ ctx.onmessage = (ev: MessageEvent<ToWorker>) => {
       case 'command':
         applyCommand(m.cmd);
         break;
+      case 'commands': {
+        if (!history || history.preview) throw new Error('Wróć do teraźniejszości lub rozwidl wybrany moment przed zmianą parametrów.');
+        if (!Array.isArray(m.commands) || m.commands.length > 100 || m.commands.some(cmd => !validCommand(cmd, world!))) throw new Error('Nieprawidłowy zestaw poleceń.');
+        for (const cmd of m.commands) applyCommand(cmd);
+        sendStatus(); sendStats();
+        post({ t: 'commands', req: m.req, tick: world!.tick, applied: m.commands.length });
+        break;
+      }
       case 'select':
         selectedId = m.id;
-        world?.select(m.id);
+        history?.select(m.id);
         dirty = true;
         break;
       case 'view':
@@ -352,6 +449,7 @@ ctx.onmessage = (ev: MessageEvent<ToWorker>) => {
         if (!world) break;
         const r = lineageQuery(m.id, m.req);
         if (r) post(r);
+        else post({ t: 'lineage', req: m.req, ancestors: [], descendants: [], descendantsTruncated: false, livingDescendants: 0 });
         break;
       }
       case 'compare':
@@ -360,10 +458,9 @@ ctx.onmessage = (ev: MessageEvent<ToWorker>) => {
       case 'save': {
         if (!world) break;
         const w = world;
-        void (async () => {
-          const bytes = await gzip(serializeWorld(w, m.label));
-          post({ t: 'saved', req: m.req, reason: m.reason, label: m.label, bytes, tick: w.tick, pop: w.pool.n, seed: w.setup.seed, engine: ENGINE_VERSION }, [bytes.buffer as ArrayBuffer]);
-        })();
+        const meta = { tick: w.tick, pop: w.pool.n, seed: w.setup.seed };
+        const raw = serializeWorld(w, m.label);
+        void gzip(raw).then(bytes => post({ t: 'saved', req: m.req, reason: m.reason, label: m.label, bytes, ...meta, engine: ENGINE_VERSION }, [bytes.buffer as ArrayBuffer])).catch(e => post({ t: 'error', req: m.req, message: String(e) }));
         break;
       }
       case 'export': {
@@ -388,6 +485,18 @@ ctx.onmessage = (ev: MessageEvent<ToWorker>) => {
       case 'ablation':
         if (world) void runAblation(m.req, m.ticks);
         break;
+      case 'atlas':
+        post({ t: 'atlas', req: m.req, atlas: behaviorAtlas(world!), species: speciesAnalysis(world!) });
+        break;
+      case 'captureSpecimen':
+        post({ t: 'specimen', req: m.req, specimen: m.archived ? captureAncestorSpecimen(world!, m.id) : captureSpecimen(world!, m.id) });
+        break;
+      case 'lab':
+        void runLaboratory(m.req, m.request);
+        break;
+      case 'cancelLab':
+        if (labRun && (m.req === undefined || m.req === labRun.req)) cancelLaboratory();
+        break;
       case 'autosave':
         autosaveEvery = m.everyTicks;
         break;
@@ -396,7 +505,7 @@ ctx.onmessage = (ev: MessageEvent<ToWorker>) => {
         break;
     }
   } catch (e) {
-    post({ t: 'error', message: e instanceof Error ? `${e.message}\n${e.stack ?? ''}` : String(e) });
+    post({ t: 'error', req: 'req' in m ? m.req : undefined, message: e instanceof Error ? `${e.message}\n${e.stack ?? ''}` : String(e) });
   }
 };
 

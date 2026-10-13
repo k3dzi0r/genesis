@@ -1,3 +1,4 @@
+import { HELP } from '../help/content';
 import { B1_OFF, B2_OFF, INPUT_LABELS, N_HID, N_IN, N_OUT, N_TRAITS, OUTPUT_LABELS, W1_OFF, W2_OFF } from '../../engine/constants';
 
 interface Props {
@@ -7,18 +8,18 @@ interface Props {
   outputs?: number[];
 }
 
-const X = [128, 256, 372];
+const X = [150, 290, 430];
 const act = (v: number | undefined) => {
   if (v === undefined) return 'var(--panel2)';
   const a = Math.min(1, Math.abs(v));
   return v >= 0 ? `rgba(61,224,197,${0.15 + a * 0.85})` : `rgba(255,107,122,${0.15 + a * 0.85})`;
 };
 
-/** Schemat sieci: krawędzie = wagi z genomu (turkus + / czerwony −), węzły = bieżąca aktywacja. */
+/** Schemat sieci: krawędzie = przekazane wagi (genom lub stan efektywny) (turkus + / czerwony −), węzły = bieżąca aktywacja. */
 export function BrainDiagram({ genome, inputs, hidden, outputs }: Props) {
-  const yIn = (i: number) => 14 + i * (292 / (N_IN - 1));
-  const yHid = (h: number) => 30 + h * (260 / (N_HID - 1));
-  const yOut = (o: number) => 34 + o * (232 / (N_OUT - 1));
+  const yIn = (i: number) => 14 + i * (378 / (N_IN - 1));
+  const yHid = (h: number) => 30 + h * (340 / (N_HID - 1));
+  const yOut = (o: number) => 34 + o * (312 / (N_OUT - 1));
   const edges: JSX.Element[] = [];
   for (let h = 0; h < N_HID; h++)
     for (let i = 0; i < N_IN; i++) {
@@ -33,11 +34,11 @@ export function BrainDiagram({ genome, inputs, hidden, outputs }: Props) {
       edges.push(<line key={`b${o}-${h}`} x1={X[1]} y1={yHid(h)} x2={X[2]} y2={yOut(o)} stroke={w > 0 ? '#3de0c5' : '#ff6b7a'} strokeOpacity={Math.min(0.9, 0.12 + Math.abs(w) * 0.28)} strokeWidth={0.3 + Math.min(2, Math.abs(w)) * 0.7} />);
     }
   return (
-    <svg viewBox="0 0 500 320" className="brain">
+    <svg viewBox="0 0 560 410" className="brain">
       {edges}
       {Array.from({ length: N_IN }, (_, i) => (
         <g key={`i${i}`}>
-          <circle cx={X[0]} cy={yIn(i)} r={5} fill={act(inputs?.[i])} stroke="var(--line)" />
+          <title>{HELP[`input.${i}`]?.short}</title><circle cx={X[0]} cy={yIn(i)} r={5} fill={act(inputs?.[i])} stroke="var(--line)" />
           <text x={X[0] - 10} y={yIn(i) + 3} textAnchor="end">
             {INPUT_LABELS[i]}
           </text>
@@ -51,7 +52,7 @@ export function BrainDiagram({ genome, inputs, hidden, outputs }: Props) {
       {Array.from({ length: N_OUT }, (_, o) => (
         <g key={`o${o}`}>
           <circle cx={X[2]} cy={yOut(o)} r={7} fill={act(outputs?.[o])} stroke="var(--line)">
-            <title>{`bias ${genome[B2_OFF + o].toFixed(2)}`}</title>
+            <title>{`${HELP[`output.${o}`]?.short} Bias ${genome[B2_OFF + o].toFixed(2)}`}</title>
           </circle>
           <text x={X[2] + 12} y={yOut(o) + 3}>
             {OUTPUT_LABELS[o]}

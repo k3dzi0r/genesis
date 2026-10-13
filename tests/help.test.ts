@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_PARAMS, DEFAULT_SETUP, PARAM_META } from '../src/engine/config';
-import { TRAIT_NAMES } from '../src/engine/constants';
+import { INPUT_LABELS, OUTPUT_LABELS, TRAIT_NAMES } from '../src/engine/constants';
 import { HELP, HELP_PARTS, funFacts, glossaryEntries } from '../src/ui/help/content';
 import { LESSONS } from '../src/ui/help/lessons';
 import { HELP_GROUPS } from '../src/ui/help/types';
@@ -11,6 +11,12 @@ describe('system pomocy edukacyjnej', () => {
     for (const k of Object.keys(PARAM_META)) expect(HELP[`param.${k}`], `brak param.${k}`).toBeTruthy();
     for (const g of new Set(Object.values(PARAM_META).map((m) => m.group))) expect(HELP[`group.${g}`], `brak group.${g}`).toBeTruthy();
     for (const t of TRAIT_NAMES) expect(HELP[`trait.${t}`], `brak trait.${t}`).toBeTruthy();
+  });
+
+  it('wszystkie kanały sieci i nowe scenariusze mają treść', () => {
+    INPUT_LABELS.forEach((_, i) => expect(HELP[`input.${i}`]).toBeTruthy());
+    OUTPUT_LABELS.forEach((_, i) => expect(HELP[`output.${i}`]).toBeTruthy());
+    for (const id of ['integrated', 'two-foods', 'perception', 'communication', 'speciation', 'learning', 'cultivation']) expect(PRESETS.some((p) => p.id === id)).toBe(true);
   });
 
   it('klucze są unikalne w całym zbiorze (żaden wpis nie nadpisuje innego)', () => {

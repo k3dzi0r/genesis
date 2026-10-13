@@ -1,0 +1,5237 @@
+{
+  "engine": "0.5.0",
+  "generatedAt": "2026-10-13T08:17:27.676Z",
+  "elapsedSeconds": 21.097,
+  "ticks": 10000,
+  "seeds": [
+    101,
+    202,
+    303,
+    404,
+    505,
+    606
+  ],
+  "setup": {
+    "seed": 101,
+    "width": 400,
+    "height": 400,
+    "cellSize": 16,
+    "capacity": 800,
+    "initialPopulation": 100,
+    "fertilityPattern": "patches",
+    "patchCount": 9,
+    "initialFoodFraction": 0.8,
+    "founderEnergyFraction": 0.6,
+    "founderWeightSd": 0.6,
+    "founderDietMax": 0.5,
+    "schedule": []
+  },
+  "params": {
+    "biomes": 1,
+    "biomeContrast": 0.6,
+    "plantBShare": 0.45,
+    "plantBToxicity": 0.02,
+    "viewCos": 0,
+    "obstacles": 0,
+    "communication": 1,
+    "signalCoef": 0.03,
+    "mateChoice": 1,
+    "plasticityRate": 0.025,
+    "learnCoef": 0.02,
+    "nicheRate": 0.3,
+    "cultivationCoef": 0.1,
+    "nicheDecay": 0.0001,
+    "regrowthRate": 0.1,
+    "foodSeed": 0.03,
+    "foodCapMax": 60,
+    "foodDecay": 0.002,
+    "patchDrift": 0,
+    "patchLife": 0,
+    "contestPower": 1,
+    "basalCoef": 0.05,
+    "moveCoef": 0.02,
+    "turnCoef": 0.01,
+    "senseCoef": 0.000006,
+    "brainCoef": 0.0003,
+    "eatCoef": 0.012,
+    "coldUpkeepCoef": 0.03,
+    "reproOverhead": 0.15,
+    "accidentRate": 0.00003,
+    "lifespanBase": 3000,
+    "maxPopulation": 600,
+    "corpseRecycling": 0.7,
+    "predationPower": 4,
+    "attackCoef": 0.03,
+    "sexual": 1,
+    "mateRange": 25,
+    "mutationRate": 0.04,
+    "mutationStrength": 0.2,
+    "traitMutationStrength": 0.05,
+    "baseTemperature": 1,
+    "coldMetabK": 2,
+    "coldDamage": 0.004,
+    "seasonPeriod": 0,
+    "seasonTempAmp": 0.3,
+    "seasonGrowthAmp": 0.5
+  },
+  "conditions": [
+    {
+      "id": "control",
+      "label": "Wszystkie badane mechaniki",
+      "patch": {}
+    },
+    {
+      "id": "communication-off",
+      "label": "Bez komunikacji",
+      "patch": {
+        "communication": 0
+      }
+    },
+    {
+      "id": "mate-choice-off",
+      "label": "Bez wyboru partnera",
+      "patch": {
+        "mateChoice": 0
+      }
+    },
+    {
+      "id": "learning-off",
+      "label": "Bez uczenia",
+      "patch": {
+        "plasticityRate": 0
+      }
+    },
+    {
+      "id": "perception-off",
+      "label": "Widzenie 360°",
+      "patch": {
+        "viewCos": -1
+      }
+    },
+    {
+      "id": "cultivation-off",
+      "label": "Bez konstrukcji niszy",
+      "patch": {
+        "nicheRate": 0
+      }
+    },
+    {
+      "id": "biomes-off",
+      "label": "Bez biomów",
+      "patch": {
+        "biomes": 0
+      }
+    }
+  ],
+  "repeatExact": true,
+  "comparisons": [
+    {
+      "condition": "communication-off",
+      "label": "Bez komunikacji",
+      "metrics": {
+        "finalPop": {
+          "meanA": 34.833333333333336,
+          "meanB": 5.666666666666667,
+          "diff": -29.166666666666668,
+          "t": -0.9999999999999999,
+          "df": 5,
+          "p": 0.36321746764919416,
+          "ciLo": -104.14197020605792,
+          "ciHi": 45.80863687272458
+        },
+        "meanPop": {
+          "meanA": 30.644399106541428,
+          "meanB": 16.802018045835837,
+          "diff": -13.842381060705591,
+          "t": -0.9153468094939322,
+          "df": 5,
+          "p": 0.4019979784473935,
+          "ciLo": -52.716142292558345,
+          "ciHi": 25.031380171147163
+        },
+        "totalBirths": {
+          "meanA": 370,
+          "meanB": 58,
+          "diff": -312,
+          "t": -0.9752505115537492,
+          "df": 5,
+          "p": 0.3742263125658787,
+          "ciLo": -1134.374890571195,
+          "ciHi": 510.3748905711951
+        },
+        "totalDeaths": {
+          "meanA": 435.1666666666667,
+          "meanB": 152.33333333333334,
+          "diff": -282.8333333333333,
+          "t": -0.9727282347088981,
+          "df": 5,
+          "p": 0.37536344288458845,
+          "ciLo": -1030.2632970546017,
+          "ciHi": 464.59663038793514
+        }
+      }
+    },
+    {
+      "condition": "mate-choice-off",
+      "label": "Bez wyboru partnera",
+      "metrics": {
+        "finalPop": {
+          "meanA": 34.833333333333336,
+          "meanB": 57.666666666666664,
+          "diff": 22.833333333333332,
+          "t": 0.9999999999999999,
+          "df": 5,
+          "p": 0.36321746764919416,
+          "ciLo": -35.86161858036154,
+          "ciHi": 81.5282852470282
+        },
+        "meanPop": {
+          "meanA": 30.644399106541428,
+          "meanB": 44.64192961324628,
+          "diff": 13.997530506704853,
+          "t": 0.9719765762314581,
+          "df": 5,
+          "p": 0.375702861789434,
+          "ciLo": -23.02167195577473,
+          "ciHi": 51.01673296918444
+        },
+        "totalBirths": {
+          "meanA": 370,
+          "meanB": 487.5,
+          "diff": 117.5,
+          "t": 1.0243507782385943,
+          "df": 5,
+          "p": 0.35264861728168095,
+          "ciLo": -177.36321688224376,
+          "ciHi": 412.36321688224376
+        },
+        "totalDeaths": {
+          "meanA": 435.1666666666667,
+          "meanB": 529.8333333333334,
+          "diff": 94.66666666666667,
+          "t": 1.030383728553916,
+          "df": 5,
+          "p": 0.3500701750689337,
+          "ciLo": -141.50594265344796,
+          "ciHi": 330.8392759867813
+        }
+      }
+    },
+    {
+      "condition": "learning-off",
+      "label": "Bez uczenia",
+      "metrics": {
+        "finalPop": {
+          "meanA": 34.833333333333336,
+          "meanB": 0,
+          "diff": -34.833333333333336,
+          "t": -1,
+          "df": 5,
+          "p": 0.36321746764919416,
+          "ciLo": -124.37526727466346,
+          "ciHi": 54.70860060799678
+        },
+        "meanPop": {
+          "meanA": 30.644399106541428,
+          "meanB": 11.958979298029782,
+          "diff": -18.685419808511643,
+          "t": -1.0818222006470428,
+          "df": 5,
+          "p": 0.32872406277286714,
+          "ciLo": -63.084953042595586,
+          "ciHi": 25.714113425572297
+        },
+        "totalBirths": {
+          "meanA": 370,
+          "meanB": 11.166666666666666,
+          "diff": -358.8333333333333,
+          "t": -1.003853537854927,
+          "df": 5,
+          "p": 0.3615276396061007,
+          "ciLo": -1277.7028834257942,
+          "ciHi": 560.0362167591277
+        },
+        "totalDeaths": {
+          "meanA": 435.1666666666667,
+          "meanB": 111.16666666666667,
+          "diff": -324,
+          "t": -1.0042620295654827,
+          "df": 5,
+          "p": 0.3613488926268966,
+          "ciLo": -1153.3338692756429,
+          "ciHi": 505.33386927564277
+        }
+      }
+    },
+    {
+      "condition": "perception-off",
+      "label": "Widzenie 360°",
+      "metrics": {
+        "finalPop": {
+          "meanA": 34.833333333333336,
+          "meanB": 24.5,
+          "diff": -10.333333333333334,
+          "t": -0.22259686374022372,
+          "df": 5,
+          "p": 0.8326565529368402,
+          "ciLo": -129.66421033634808,
+          "ciHi": 108.99754366968142
+        },
+        "meanPop": {
+          "meanA": 30.644399106541428,
+          "meanB": 25.910310712908757,
+          "diff": -4.73408839363267,
+          "t": -0.21115726491213338,
+          "df": 5,
+          "p": 0.841101033400516,
+          "ciLo": -62.36583333043388,
+          "ciHi": 52.897656543168544
+        },
+        "totalBirths": {
+          "meanA": 370,
+          "meanB": 136.33333333333334,
+          "diff": -233.66666666666666,
+          "t": -0.5736317769784613,
+          "df": 5,
+          "p": 0.591053440849395,
+          "ciLo": -1280.7831498066203,
+          "ciHi": 813.4498164732869
+        },
+        "totalDeaths": {
+          "meanA": 435.1666666666667,
+          "meanB": 211.83333333333334,
+          "diff": -223.33333333333334,
+          "t": -0.6164568963696277,
+          "df": 5,
+          "p": 0.564574481732373,
+          "ciLo": -1154.617602095149,
+          "ciHi": 707.9509354284825
+        }
+      }
+    },
+    {
+      "condition": "cultivation-off",
+      "label": "Bez konstrukcji niszy",
+      "metrics": {
+        "finalPop": {
+          "meanA": 34.833333333333336,
+          "meanB": 20.166666666666668,
+          "diff": -14.666666666666666,
+          "t": -0.3363839659676322,
+          "df": 5,
+          "p": 0.7502395805056041,
+          "ciLo": -126.74652402316471,
+          "ciHi": 97.41319068983137
+        },
+        "meanPop": {
+          "meanA": 30.644399106541428,
+          "meanB": 24.351790396893552,
+          "diff": -6.292608709647873,
+          "t": -0.30931089170797443,
+          "df": 5,
+          "p": 0.769559600506442,
+          "ciLo": -58.58842525353839,
+          "ciHi": 46.003207834242644
+        },
+        "totalBirths": {
+          "meanA": 370,
+          "meanB": 142.33333333333334,
+          "diff": -227.66666666666666,
+          "t": -0.5643115865033228,
+          "df": 5,
+          "p": 0.5969154970749588,
+          "ciLo": -1264.745847584291,
+          "ciHi": 809.4125142509575
+        },
+        "totalDeaths": {
+          "meanA": 435.1666666666667,
+          "meanB": 222.16666666666666,
+          "diff": -213,
+          "t": -0.5909521195547791,
+          "df": 5,
+          "p": 0.5802532362408499,
+          "ciLo": -1139.5284155390382,
+          "ciHi": 713.5284155390382
+        }
+      }
+    },
+    {
+      "condition": "biomes-off",
+      "label": "Bez biomów",
+      "metrics": {
+        "finalPop": {
+          "meanA": 34.833333333333336,
+          "meanB": 38.666666666666664,
+          "diff": 3.8333333333333335,
+          "t": 0.09911197057469107,
+          "df": 5,
+          "p": 0.924900351413072,
+          "ciLo": -95.58853245612528,
+          "ciHi": 103.25519912279194
+        },
+        "meanPop": {
+          "meanA": 30.644399106541428,
+          "meanB": 33.345210497867406,
+          "diff": 2.7008113913259826,
+          "t": 0.11545177919277538,
+          "df": 5,
+          "p": 0.9125803855185946,
+          "ciLo": -57.43387646332897,
+          "ciHi": 62.83549924598094
+        },
+        "totalBirths": {
+          "meanA": 370,
+          "meanB": 261.1666666666667,
+          "diff": -108.83333333333333,
+          "t": -0.3135689998224224,
+          "df": 5,
+          "p": 0.7665078597273811,
+          "ciLo": -1001.0292772463099,
+          "ciHi": 783.3626105796432
+        },
+        "totalDeaths": {
+          "meanA": 435.1666666666667,
+          "meanB": 322.5,
+          "diff": -112.66666666666667,
+          "t": -0.36357031244296484,
+          "df": 5,
+          "p": 0.7310453717601293,
+          "ciLo": -909.263299843238,
+          "ciHi": 683.9299665099047
+        }
+      }
+    }
+  ],
+  "runs": [
+    {
+      "condition": "control",
+      "summary": {
+        "seed": 101,
+        "ticks": 4063,
+        "status": "extinct",
+        "extinctionTick": 4063,
+        "finalPop": 0,
+        "meanPop": 13.053658536585365,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 16,
+        "totalDeaths": 116
+      },
+      "initialHash": 1842055000,
+      "finalHash": 465994908,
+      "energyImbalance": -2.6921043172478676e-10,
+      "observationsImmutable": true,
+      "resumeExact": true,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1975.2963236367784,
+            "foodB": 367.36975979124963,
+            "meanTemperature": 1,
+            "births": 15,
+            "deaths": 47,
+            "entries": 40,
+            "exits": 39
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 1906.9211551009873,
+            "foodB": 205.5196263043083,
+            "meanTemperature": 0.7599999964237184,
+            "births": 0,
+            "deaths": 36,
+            "entries": 18,
+            "exits": 23
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 2507.0455839593187,
+            "foodB": 789.8396495338498,
+            "meanTemperature": 1.0719999983906783,
+            "births": 1,
+            "deaths": 33,
+            "entries": 21,
+            "exits": 17
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            18,
+            21
+          ],
+          [
+            23,
+            0,
+            0
+          ],
+          [
+            17,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 0,
+        "plasticChange": 0,
+        "nicheMean": 0.0037677044973313967,
+        "biomeMigrations": 79,
+        "foodFrac": 1.0093073070765917,
+        "foodB": 1362.7290356294095
+      }
+    },
+    {
+      "condition": "communication-off",
+      "summary": {
+        "seed": 101,
+        "ticks": 3605,
+        "status": "extinct",
+        "extinctionTick": 3605,
+        "finalPop": 0,
+        "meanPop": 15.862637362637363,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 10,
+        "totalDeaths": 110
+      },
+      "initialHash": 1800005723,
+      "finalHash": 1504198986,
+      "energyImbalance": -1.0186340659856796e-10,
+      "observationsImmutable": true,
+      "resumeExact": true,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1891.024264963084,
+            "foodB": 364.87640675070605,
+            "meanTemperature": 1,
+            "births": 7,
+            "deaths": 38,
+            "entries": 92,
+            "exits": 92
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 1974.2509529527304,
+            "foodB": 203.74200821492673,
+            "meanTemperature": 0.7599999964237184,
+            "births": 2,
+            "deaths": 42,
+            "entries": 26,
+            "exits": 27
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 2515.329170052014,
+            "foodB": 793.3635035974933,
+            "meanTemperature": 1.0719999983906783,
+            "births": 1,
+            "deaths": 30,
+            "entries": 66,
+            "exits": 65
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            26,
+            66
+          ],
+          [
+            27,
+            0,
+            0
+          ],
+          [
+            65,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 724,
+        "plasticChange": 0,
+        "nicheMean": 0.0031046059622707616,
+        "biomeMigrations": 184,
+        "foodFrac": 1.0113570166243555,
+        "foodB": 1361.98191856313
+      }
+    },
+    {
+      "condition": "mate-choice-off",
+      "summary": {
+        "seed": 101,
+        "ticks": 4063,
+        "status": "extinct",
+        "extinctionTick": 4063,
+        "finalPop": 0,
+        "meanPop": 13.053658536585365,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 16,
+        "totalDeaths": 116
+      },
+      "initialHash": 2834911673,
+      "finalHash": 3055454055,
+      "energyImbalance": -2.6921043172478676e-10,
+      "observationsImmutable": true,
+      "resumeExact": true,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1975.2963236367784,
+            "foodB": 367.36975979124963,
+            "meanTemperature": 1,
+            "births": 15,
+            "deaths": 47,
+            "entries": 40,
+            "exits": 39
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 1906.9211551009873,
+            "foodB": 205.5196263043083,
+            "meanTemperature": 0.7599999964237184,
+            "births": 0,
+            "deaths": 36,
+            "entries": 18,
+            "exits": 23
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 2507.0455839593187,
+            "foodB": 789.8396495338498,
+            "meanTemperature": 1.0719999983906783,
+            "births": 1,
+            "deaths": 33,
+            "entries": 21,
+            "exits": 17
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            18,
+            21
+          ],
+          [
+            23,
+            0,
+            0
+          ],
+          [
+            17,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 0,
+        "plasticChange": 0,
+        "nicheMean": 0.0037677044973313967,
+        "biomeMigrations": 79,
+        "foodFrac": 1.0093073070765917,
+        "foodB": 1362.7290356294095
+      }
+    },
+    {
+      "condition": "learning-off",
+      "summary": {
+        "seed": 101,
+        "ticks": 3153,
+        "status": "extinct",
+        "extinctionTick": 3153,
+        "finalPop": 0,
+        "meanPop": 13.515723270440251,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 2,
+        "totalDeaths": 102
+      },
+      "initialHash": 3388581487,
+      "finalHash": 441463321,
+      "energyImbalance": 9.00399754755199e-11,
+      "observationsImmutable": true,
+      "resumeExact": true,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1980.7984068591106,
+            "foodB": 365.2850008482445,
+            "meanTemperature": 1,
+            "births": 2,
+            "deaths": 31,
+            "entries": 59,
+            "exits": 61
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 1904.2807171048598,
+            "foodB": 205.04916808746373,
+            "meanTemperature": 0.7599999964237184,
+            "births": 0,
+            "deaths": 38,
+            "entries": 34,
+            "exits": 37
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 2509.6675918689543,
+            "foodB": 792.5484548001775,
+            "meanTemperature": 1.0719999983906783,
+            "births": 0,
+            "deaths": 33,
+            "entries": 27,
+            "exits": 22
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            34,
+            27
+          ],
+          [
+            37,
+            0,
+            0
+          ],
+          [
+            22,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 0,
+        "plasticChange": 0,
+        "nicheMean": 0.0031409624589957092,
+        "biomeMigrations": 120,
+        "foodFrac": 1.013141550084049,
+        "foodB": 1362.8826237358892
+      }
+    },
+    {
+      "condition": "perception-off",
+      "summary": {
+        "seed": 101,
+        "ticks": 3285,
+        "status": "extinct",
+        "extinctionTick": 3285,
+        "finalPop": 0,
+        "meanPop": 16.367469879518072,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 0,
+        "totalDeaths": 100
+      },
+      "initialHash": 342123868,
+      "finalHash": 1549249185,
+      "energyImbalance": -1.8098944565281272e-10,
+      "observationsImmutable": true,
+      "resumeExact": true,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1956.3847813030811,
+            "foodB": 364.7463104547362,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 39,
+            "entries": 38,
+            "exits": 30
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 2096.947227472112,
+            "foodB": 214.63800284149542,
+            "meanTemperature": 0.7599999964237184,
+            "births": 0,
+            "deaths": 34,
+            "entries": 16,
+            "exits": 23
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 2614.054307542014,
+            "foodB": 796.987897115498,
+            "meanTemperature": 1.0719999983906783,
+            "births": 0,
+            "deaths": 27,
+            "entries": 14,
+            "exits": 15
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            16,
+            14
+          ],
+          [
+            23,
+            0,
+            0
+          ],
+          [
+            15,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 0,
+        "plasticChange": 0,
+        "nicheMean": 0.004332063555147215,
+        "biomeMigrations": 68,
+        "foodFrac": 1.0444173498945917,
+        "foodB": 1376.3722104117312
+      }
+    },
+    {
+      "condition": "cultivation-off",
+      "summary": {
+        "seed": 101,
+        "ticks": 4391,
+        "status": "extinct",
+        "extinctionTick": 4391,
+        "finalPop": 0,
+        "meanPop": 13.380090497737557,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 8,
+        "totalDeaths": 108
+      },
+      "initialHash": 4076763629,
+      "finalHash": 3473709781,
+      "energyImbalance": -1.140506356023252e-9,
+      "observationsImmutable": true,
+      "resumeExact": true,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1894.7337674706662,
+            "foodB": 358.3804331103693,
+            "meanTemperature": 1,
+            "births": 4,
+            "deaths": 38,
+            "entries": 83,
+            "exits": 80
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 1857.848382264386,
+            "foodB": 200.96988316064687,
+            "meanTemperature": 0.7599999964237184,
+            "births": 0,
+            "deaths": 37,
+            "entries": 34,
+            "exits": 38
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 2576.0457448577054,
+            "foodB": 781.6035291991042,
+            "meanTemperature": 1.0719999983906783,
+            "births": 4,
+            "deaths": 33,
+            "entries": 46,
+            "exits": 45
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            34,
+            46
+          ],
+          [
+            38,
+            0,
+            0
+          ],
+          [
+            45,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 578,
+        "plasticChange": 0,
+        "nicheMean": 0,
+        "biomeMigrations": 163,
+        "foodFrac": 1.0172913681586826,
+        "foodB": 1340.9538454701283
+      }
+    },
+    {
+      "condition": "biomes-off",
+      "summary": {
+        "seed": 101,
+        "ticks": 3224,
+        "status": "extinct",
+        "extinctionTick": 3224,
+        "finalPop": 0,
+        "meanPop": 16.11042944785276,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 10,
+        "totalDeaths": 110
+      },
+      "initialHash": 2231313097,
+      "finalHash": 2680549380,
+      "energyImbalance": 2.091837814077735e-11,
+      "observationsImmutable": true,
+      "resumeExact": true,
+      "biomes": {
+        "enabled": false,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1967.3760501487707,
+            "foodB": 364.2857312373445,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 0,
+            "entries": 0,
+            "exits": 0
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 2327.5441525024735,
+            "foodB": 465.3693288866952,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 0,
+            "entries": 0,
+            "exits": 0
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 2340.2496492856685,
+            "foodB": 431.6627371000842,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 0,
+            "entries": 0,
+            "exits": 0
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 0,
+        "plasticChange": 0,
+        "nicheMean": 0.0034422397908890163,
+        "biomeMigrations": 0,
+        "foodFrac": 1.0275559491394672,
+        "foodB": 1261.3177972241278
+      }
+    },
+    {
+      "condition": "control",
+      "summary": {
+        "seed": 202,
+        "ticks": 2954,
+        "status": "extinct",
+        "extinctionTick": 2954,
+        "finalPop": 0,
+        "meanPop": 14.731543624161073,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 7,
+        "totalDeaths": 107
+      },
+      "initialHash": 3898927398,
+      "finalHash": 283247248,
+      "energyImbalance": -2.2009771782904863e-10,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1866.9040193953263,
+            "foodB": 343.2975038476959,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 30,
+            "entries": 66,
+            "exits": 66
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 1433.8247954972906,
+            "foodB": 155.33381360093645,
+            "meanTemperature": 0.7599999964237184,
+            "births": 0,
+            "deaths": 29,
+            "entries": 24,
+            "exits": 27
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 3794.2780038322176,
+            "foodB": 1192.4138654873107,
+            "meanTemperature": 1.0719999983906783,
+            "births": 7,
+            "deaths": 48,
+            "entries": 42,
+            "exits": 39
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            24,
+            42
+          ],
+          [
+            27,
+            0,
+            0
+          ],
+          [
+            39,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 293,
+        "plasticChange": 0,
+        "nicheMean": 0.0032586856442107775,
+        "biomeMigrations": 132,
+        "foodFrac": 1.0095484200870235,
+        "foodB": 1691.0451829359456
+      }
+    },
+    {
+      "condition": "communication-off",
+      "summary": {
+        "seed": 202,
+        "ticks": 7012,
+        "status": "extinct",
+        "extinctionTick": 7012,
+        "finalPop": 0,
+        "meanPop": 12.073863636363637,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 57,
+        "totalDeaths": 157
+      },
+      "initialHash": 841142943,
+      "finalHash": 718153582,
+      "energyImbalance": -9.076757123693824e-10,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1864.380310158269,
+            "foodB": 341.3806253388908,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 25,
+            "entries": 94,
+            "exits": 99
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 1430.9421637848159,
+            "foodB": 154.7447286743399,
+            "meanTemperature": 0.7599999964237184,
+            "births": 0,
+            "deaths": 34,
+            "entries": 19,
+            "exits": 17
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 3865.104094776348,
+            "foodB": 1204.7004249553313,
+            "meanTemperature": 1.0719999983906783,
+            "births": 57,
+            "deaths": 98,
+            "entries": 80,
+            "exits": 77
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            19,
+            80
+          ],
+          [
+            17,
+            0,
+            0
+          ],
+          [
+            77,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 478,
+        "plasticChange": 0,
+        "nicheMean": 0.005385150962785701,
+        "biomeMigrations": 193,
+        "foodFrac": 1.0089445601302651,
+        "foodB": 1700.8257789685642
+      }
+    },
+    {
+      "condition": "mate-choice-off",
+      "summary": {
+        "seed": 202,
+        "ticks": 4395,
+        "status": "extinct",
+        "extinctionTick": 4395,
+        "finalPop": 0,
+        "meanPop": 12,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 13,
+        "totalDeaths": 113
+      },
+      "initialHash": 518456117,
+      "finalHash": 2185403418,
+      "energyImbalance": -3.6925484891980886e-10,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1949.9903632555427,
+            "foodB": 341.525601610695,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 29,
+            "entries": 96,
+            "exits": 97
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 1431.9717598325171,
+            "foodB": 155.2387516148813,
+            "meanTemperature": 0.7599999964237184,
+            "births": 0,
+            "deaths": 32,
+            "entries": 62,
+            "exits": 62
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 3736.488068564933,
+            "foodB": 1190.0235845324264,
+            "meanTemperature": 1.0719999983906783,
+            "births": 13,
+            "deaths": 52,
+            "entries": 35,
+            "exits": 34
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            62,
+            35
+          ],
+          [
+            62,
+            0,
+            0
+          ],
+          [
+            34,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 0,
+        "plasticChange": 0,
+        "nicheMean": 0.0030545451653646296,
+        "biomeMigrations": 193,
+        "foodFrac": 1.0126437129256494,
+        "foodB": 1686.787937758005
+      }
+    },
+    {
+      "condition": "learning-off",
+      "summary": {
+        "seed": 202,
+        "ticks": 3926,
+        "status": "extinct",
+        "extinctionTick": 3926,
+        "finalPop": 0,
+        "meanPop": 14.803030303030303,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 23,
+        "totalDeaths": 123
+      },
+      "initialHash": 1266119051,
+      "finalHash": 791437474,
+      "energyImbalance": 1.6370904631912708e-10,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1872.630050675057,
+            "foodB": 343.72353883330936,
+            "meanTemperature": 1,
+            "births": 1,
+            "deaths": 28,
+            "entries": 109,
+            "exits": 112
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 1432.2947274225023,
+            "foodB": 154.99503668923126,
+            "meanTemperature": 0.7599999964237184,
+            "births": 0,
+            "deaths": 35,
+            "entries": 34,
+            "exits": 31
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 3832.786980650079,
+            "foodB": 1197.7864921973924,
+            "meanTemperature": 1.0719999983906783,
+            "births": 22,
+            "deaths": 60,
+            "entries": 78,
+            "exits": 78
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            34,
+            78
+          ],
+          [
+            31,
+            0,
+            0
+          ],
+          [
+            78,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 1757,
+        "plasticChange": 0,
+        "nicheMean": 0.004023007341879566,
+        "biomeMigrations": 221,
+        "foodFrac": 1.011750656965349,
+        "foodB": 1696.505067719934
+      }
+    },
+    {
+      "condition": "perception-off",
+      "summary": {
+        "seed": 202,
+        "ticks": 5499,
+        "status": "extinct",
+        "extinctionTick": 5499,
+        "finalPop": 0,
+        "meanPop": 13.605072463768115,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 26,
+        "totalDeaths": 126
+      },
+      "initialHash": 651222560,
+      "finalHash": 1018334363,
+      "energyImbalance": -2.9103830456733704e-10,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1903.849721106565,
+            "foodB": 347.2946389138046,
+            "meanTemperature": 1,
+            "births": 4,
+            "deaths": 38,
+            "entries": 86,
+            "exits": 82
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 1433.5021034721408,
+            "foodB": 155.9661032474994,
+            "meanTemperature": 0.7599999964237184,
+            "births": 0,
+            "deaths": 32,
+            "entries": 41,
+            "exits": 41
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 3843.5867462594742,
+            "foodB": 1229.831686357155,
+            "meanTemperature": 1.0719999983906783,
+            "births": 22,
+            "deaths": 56,
+            "entries": 41,
+            "exits": 45
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            41,
+            41
+          ],
+          [
+            41,
+            0,
+            0
+          ],
+          [
+            45,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 1290,
+        "plasticChange": 0,
+        "nicheMean": 0.005983198416549567,
+        "biomeMigrations": 168,
+        "foodFrac": 1.012368848313378,
+        "foodB": 1733.0924285184644
+      }
+    },
+    {
+      "condition": "cultivation-off",
+      "summary": {
+        "seed": 202,
+        "ticks": 3189,
+        "status": "extinct",
+        "extinctionTick": 3189,
+        "finalPop": 0,
+        "meanPop": 17.59006211180124,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 11,
+        "totalDeaths": 111
+      },
+      "initialHash": 3983652213,
+      "finalHash": 1260341711,
+      "energyImbalance": -1.1586962500587106e-9,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1847.2499795388549,
+            "foodB": 336.0231840111308,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 30,
+            "entries": 64,
+            "exits": 64
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 1409.6703771098285,
+            "foodB": 152.78229321735853,
+            "meanTemperature": 0.7599999964237184,
+            "births": 0,
+            "deaths": 29,
+            "entries": 34,
+            "exits": 37
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 3795.5854285074674,
+            "foodB": 1176.1734012124064,
+            "meanTemperature": 1.0719999983906783,
+            "births": 11,
+            "deaths": 52,
+            "entries": 30,
+            "exits": 27
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            34,
+            30
+          ],
+          [
+            37,
+            0,
+            0
+          ],
+          [
+            27,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 109,
+        "plasticChange": 0,
+        "nicheMean": 0,
+        "biomeMigrations": 128,
+        "foodFrac": 1.0159348298476858,
+        "foodB": 1664.9788784409025
+      }
+    },
+    {
+      "condition": "biomes-off",
+      "summary": {
+        "seed": 202,
+        "ticks": 3189,
+        "status": "extinct",
+        "extinctionTick": 3189,
+        "finalPop": 0,
+        "meanPop": 18.19254658385093,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 18,
+        "totalDeaths": 118
+      },
+      "initialHash": 2548109358,
+      "finalHash": 2644877097,
+      "energyImbalance": -1.3096723705530167e-10,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": false,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1870.3339527679675,
+            "foodB": 342.88347568444755,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 0,
+            "entries": 0,
+            "exits": 0
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 1744.316622908727,
+            "foodB": 353.704092818259,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 0,
+            "entries": 0,
+            "exits": 0
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 3520.7769961956933,
+            "foodB": 653.8903321767929,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 0,
+            "entries": 0,
+            "exits": 0
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 3106,
+        "plasticChange": 0,
+        "nicheMean": 0.004395732740114909,
+        "biomeMigrations": 0,
+        "foodFrac": 1.0222472302379715,
+        "foodB": 1350.4779006795015
+      }
+    },
+    {
+      "condition": "control",
+      "summary": {
+        "seed": 303,
+        "ticks": 2922,
+        "status": "extinct",
+        "extinctionTick": 2922,
+        "finalPop": 0,
+        "meanPop": 15.20945945945946,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 7,
+        "totalDeaths": 107
+      },
+      "initialHash": 1590473171,
+      "finalHash": 910323651,
+      "energyImbalance": -1.737134880386293e-10,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1351.8621297990824,
+            "foodB": 278.28367053860114,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 26,
+            "entries": 141,
+            "exits": 144
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 1058.3129908498327,
+            "foodB": 95.397941312469,
+            "meanTemperature": 0.7599999964237184,
+            "births": 2,
+            "deaths": 41,
+            "entries": 98,
+            "exits": 96
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 2990.7459243860017,
+            "foodB": 931.247323386197,
+            "meanTemperature": 1.0719999983906783,
+            "births": 5,
+            "deaths": 40,
+            "entries": 46,
+            "exits": 45
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            98,
+            46
+          ],
+          [
+            96,
+            0,
+            0
+          ],
+          [
+            45,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 3713,
+        "plasticChange": 0,
+        "nicheMean": 0.00362302514820924,
+        "biomeMigrations": 285,
+        "foodFrac": 1.0177984095545516,
+        "foodB": 1304.9289352372664
+      }
+    },
+    {
+      "condition": "communication-off",
+      "summary": {
+        "seed": 303,
+        "ticks": 3303,
+        "status": "extinct",
+        "extinctionTick": 3303,
+        "finalPop": 0,
+        "meanPop": 12.808383233532934,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 3,
+        "totalDeaths": 103
+      },
+      "initialHash": 1629460594,
+      "finalHash": 366622413,
+      "energyImbalance": -1.7553247744217515e-10,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1346.720469816106,
+            "foodB": 276.9767725112871,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 25,
+            "entries": 54,
+            "exits": 58
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 953.7432544995872,
+            "foodB": 94.4216803175741,
+            "meanTemperature": 0.7599999964237184,
+            "births": 2,
+            "deaths": 37,
+            "entries": 33,
+            "exits": 35
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 3070.992995773407,
+            "foodB": 934.7955085871729,
+            "meanTemperature": 1.0719999983906783,
+            "births": 1,
+            "deaths": 41,
+            "entries": 25,
+            "exits": 19
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            33,
+            25
+          ],
+          [
+            35,
+            0,
+            0
+          ],
+          [
+            19,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 2212,
+        "plasticChange": 0,
+        "nicheMean": 0.003594426103171463,
+        "biomeMigrations": 112,
+        "foodFrac": 1.0136833886345942,
+        "foodB": 1306.1939614160328
+      }
+    },
+    {
+      "condition": "mate-choice-off",
+      "summary": {
+        "seed": 303,
+        "ticks": 3252,
+        "status": "extinct",
+        "extinctionTick": 3252,
+        "finalPop": 0,
+        "meanPop": 13.560975609756097,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 14,
+        "totalDeaths": 114
+      },
+      "initialHash": 1169774808,
+      "finalHash": 1826996888,
+      "energyImbalance": -7.821654435247183e-11,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1377.9697899161126,
+            "foodB": 276.9380302871943,
+            "meanTemperature": 1,
+            "births": 1,
+            "deaths": 29,
+            "entries": 100,
+            "exits": 101
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 960.048701802431,
+            "foodB": 95.12555262721754,
+            "meanTemperature": 0.7599999964237184,
+            "births": 8,
+            "deaths": 44,
+            "entries": 61,
+            "exits": 62
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 3072.5640423020723,
+            "foodB": 920.4439731686614,
+            "meanTemperature": 1.0719999983906783,
+            "births": 5,
+            "deaths": 41,
+            "entries": 40,
+            "exits": 38
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            61,
+            40
+          ],
+          [
+            62,
+            0,
+            0
+          ],
+          [
+            38,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 0,
+        "plasticChange": 0,
+        "nicheMean": 0.003107439190946468,
+        "biomeMigrations": 201,
+        "foodFrac": 1.02037384939543,
+        "foodB": 1292.5075560830724
+      }
+    },
+    {
+      "condition": "learning-off",
+      "summary": {
+        "seed": 303,
+        "ticks": 4325,
+        "status": "extinct",
+        "extinctionTick": 4325,
+        "finalPop": 0,
+        "meanPop": 10.036697247706423,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 2,
+        "totalDeaths": 102
+      },
+      "initialHash": 1245088950,
+      "finalHash": 29156047,
+      "energyImbalance": 1.1550582712516189e-10,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1342.3889113616317,
+            "foodB": 275.41873400026014,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 30,
+            "entries": 58,
+            "exits": 57
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 939.3588927277424,
+            "foodB": 92.70610600803383,
+            "meanTemperature": 0.7599999964237184,
+            "births": 0,
+            "deaths": 36,
+            "entries": 28,
+            "exits": 29
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 2983.3493446272328,
+            "foodB": 929.778282607126,
+            "meanTemperature": 1.0719999983906783,
+            "births": 2,
+            "deaths": 36,
+            "entries": 29,
+            "exits": 29
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            28,
+            29
+          ],
+          [
+            29,
+            0,
+            0
+          ],
+          [
+            29,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 61,
+        "plasticChange": 0,
+        "nicheMean": 0.0029616278538969225,
+        "biomeMigrations": 115,
+        "foodFrac": 0.9998810137277855,
+        "foodB": 1297.9031226154207
+      }
+    },
+    {
+      "condition": "perception-off",
+      "summary": {
+        "seed": 303,
+        "ticks": 10000,
+        "status": "running",
+        "extinctionTick": null,
+        "finalPop": 147,
+        "meanPop": 82.49101796407186,
+        "minPop": 18,
+        "maxPop": 150,
+        "maxGeneration": 26,
+        "meanTraits": {
+          "size": 0.5279086092296912,
+          "speed": 0.6208485005055966,
+          "sense": 0.3122214714483339,
+          "reproThreshold": 0.3942108728042265,
+          "investment": 0.5726150837885279,
+          "maturity": 0.8109327358047979,
+          "coldTolerance": 0.4818708073525202,
+          "bite": 0.6050064628627024,
+          "hue": 0.17818007496546726,
+          "memory": 0.4388987070240942,
+          "diet": 0.04952700324609977,
+          "plantSpecialization": 0.7388846789087568,
+          "matePreference": 0.23937219290100797,
+          "mateSelectivity": 0.2844899514702713,
+          "plasticity": 0.27188485141108637,
+          "nicheInvestment": 0.4917749456402396
+        },
+        "diversity": 0.07640754054794414,
+        "carnFrac": 0,
+        "cladeTop": 0.9727891156462585,
+        "cladeCount": 2,
+        "predRate": 4.166666666666667,
+        "totalBirths": 779,
+        "totalDeaths": 732
+      },
+      "initialHash": 2614972669,
+      "finalHash": 434222684,
+      "energyImbalance": -3.8198777474462986e-11,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 28,
+            "foodA": 486.91386511824044,
+            "foodB": 100.20245841957339,
+            "meanTemperature": 1,
+            "births": 155,
+            "deaths": 173,
+            "entries": 1290,
+            "exits": 1273
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 12,
+            "foodA": 640.515245936601,
+            "foodB": 59.70276073441649,
+            "meanTemperature": 0.7599999964237184,
+            "births": 20,
+            "deaths": 72,
+            "entries": 396,
+            "exits": 369
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 107,
+            "foodA": 417.52399414035494,
+            "foodB": 154.9821761786731,
+            "meanTemperature": 1.0719999983906783,
+            "births": 604,
+            "deaths": 487,
+            "entries": 877,
+            "exits": 921
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            396,
+            877
+          ],
+          [
+            369,
+            0,
+            0
+          ],
+          [
+            921,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0.5695551188418038,
+        "mateRejected": 6574,
+        "plasticChange": 0.007481585889664896,
+        "nicheMean": 0.021487627559259453,
+        "biomeMigrations": 2563,
+        "foodFrac": 0.25622909643807085,
+        "foodB": 314.8873953326627
+      }
+    },
+    {
+      "condition": "cultivation-off",
+      "summary": {
+        "seed": 303,
+        "ticks": 10000,
+        "status": "running",
+        "extinctionTick": null,
+        "finalPop": 121,
+        "meanPop": 69.94610778443113,
+        "minPop": 9,
+        "maxPop": 121,
+        "maxGeneration": 26,
+        "meanTraits": {
+          "size": 0.49931248677663564,
+          "speed": 0.5579665251507246,
+          "sense": 0.4422755155188978,
+          "reproThreshold": 0.7450122202723479,
+          "investment": 0.710747484333259,
+          "maturity": 0.19395641231339825,
+          "coldTolerance": 0.22961847348646683,
+          "bite": 0.4310558086091822,
+          "hue": 0.5149272771413661,
+          "memory": 0.5494873271254469,
+          "diet": 0.06376213430665618,
+          "plantSpecialization": 0.6186527880755338,
+          "matePreference": 0.49974149908901244,
+          "mateSelectivity": 0.5570421731176455,
+          "plasticity": 0.21594735033702384,
+          "nicheInvestment": 0.7959158982127166
+        },
+        "diversity": 0.06705273445029868,
+        "carnFrac": 0.12396694214876033,
+        "cladeTop": 0.9752066115702479,
+        "cladeCount": 2,
+        "predRate": 41.666666666666664,
+        "totalBirths": 774,
+        "totalDeaths": 753
+      },
+      "initialHash": 65790392,
+      "finalHash": 3731885310,
+      "energyImbalance": -1.2569216778501868e-9,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 31,
+            "foodA": 600.8102494501468,
+            "foodB": 112.60456154453678,
+            "meanTemperature": 1,
+            "births": 168,
+            "deaths": 115,
+            "entries": 2258,
+            "exits": 2309
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 14,
+            "foodA": 528.4530981088525,
+            "foodB": 48.88204532865192,
+            "meanTemperature": 0.7599999964237184,
+            "births": 30,
+            "deaths": 61,
+            "entries": 848,
+            "exits": 840
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 76,
+            "foodA": 1439.0236019617216,
+            "foodB": 484.32435103726283,
+            "meanTemperature": 1.0719999983906783,
+            "births": 576,
+            "deaths": 577,
+            "entries": 1461,
+            "exits": 1418
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            848,
+            1461
+          ],
+          [
+            840,
+            0,
+            0
+          ],
+          [
+            1418,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0.7498315993527119,
+        "mateRejected": 2262,
+        "plasticChange": 0.012700802335676688,
+        "nicheMean": 0,
+        "biomeMigrations": 4567,
+        "foodFrac": 0.49809968424539325,
+        "foodB": 645.8109579104515
+      }
+    },
+    {
+      "condition": "biomes-off",
+      "summary": {
+        "seed": 303,
+        "ticks": 2018,
+        "status": "extinct",
+        "extinctionTick": 2018,
+        "finalPop": 0,
+        "meanPop": 18.676470588235293,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 6,
+        "totalDeaths": 106
+      },
+      "initialHash": 202517364,
+      "finalHash": 152931078,
+      "energyImbalance": 5.4569682106375694e-12,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": false,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1377.6134806883585,
+            "foodB": 274.09816353961565,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 0,
+            "entries": 0,
+            "exits": 0
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 1161.146861865377,
+            "foodB": 212.8035478354346,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 0,
+            "entries": 0,
+            "exits": 0
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 2698.9176939002095,
+            "foodB": 508.79960345444414,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 0,
+            "entries": 0,
+            "exits": 0
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 982,
+        "plasticChange": 0,
+        "nicheMean": 0.0032023856915088687,
+        "biomeMigrations": 0,
+        "foodFrac": 1.014370517318681,
+        "foodB": 995.7013148294944
+      }
+    },
+    {
+      "condition": "control",
+      "summary": {
+        "seed": 404,
+        "ticks": 3861,
+        "status": "extinct",
+        "extinctionTick": 3861,
+        "finalPop": 0,
+        "meanPop": 14.061538461538461,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 6,
+        "totalDeaths": 106
+      },
+      "initialHash": 1493662394,
+      "finalHash": 217483918,
+      "energyImbalance": -3.7834979593753815e-10,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 2163.2936743522496,
+            "foodB": 390.83606164517926,
+            "meanTemperature": 1,
+            "births": 6,
+            "deaths": 38,
+            "entries": 72,
+            "exits": 74
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 208,
+            "population": 0,
+            "foodA": 2337.7084021846936,
+            "foodB": 236.55818510211242,
+            "meanTemperature": 0.7599999964237184,
+            "births": 0,
+            "deaths": 33,
+            "entries": 36,
+            "exits": 40
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 208,
+            "population": 0,
+            "foodA": 1744.2366527346726,
+            "foodB": 576.2736364350421,
+            "meanTemperature": 1.0719999983906783,
+            "births": 0,
+            "deaths": 35,
+            "entries": 38,
+            "exits": 32
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            36,
+            38
+          ],
+          [
+            40,
+            0,
+            0
+          ],
+          [
+            32,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 112,
+        "plasticChange": 0,
+        "nicheMean": 0.0036457840035493973,
+        "biomeMigrations": 146,
+        "foodFrac": 1.0184800216489744,
+        "foodB": 1203.6678831823333
+      }
+    },
+    {
+      "condition": "communication-off",
+      "summary": {
+        "seed": 404,
+        "ticks": 3318,
+        "status": "extinct",
+        "extinctionTick": 3318,
+        "finalPop": 0,
+        "meanPop": 15.437125748502995,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 8,
+        "totalDeaths": 108
+      },
+      "initialHash": 3282898961,
+      "finalHash": 1250526399,
+      "energyImbalance": -3.3651303965598345e-11,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 2120.5022383041432,
+            "foodB": 390.2501569633427,
+            "meanTemperature": 1,
+            "births": 6,
+            "deaths": 38,
+            "entries": 73,
+            "exits": 75
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 208,
+            "population": 0,
+            "foodA": 2423.5453939770446,
+            "foodB": 237.67879352717227,
+            "meanTemperature": 0.7599999964237184,
+            "births": 2,
+            "deaths": 37,
+            "entries": 38,
+            "exits": 40
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 208,
+            "population": 0,
+            "foodA": 1743.7844144922908,
+            "foodB": 575.9132383237978,
+            "meanTemperature": 1.0719999983906783,
+            "births": 0,
+            "deaths": 33,
+            "entries": 37,
+            "exits": 33
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            38,
+            37
+          ],
+          [
+            40,
+            0,
+            0
+          ],
+          [
+            33,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 2890,
+        "plasticChange": 0,
+        "nicheMean": 0.0037586755233300208,
+        "biomeMigrations": 148,
+        "foodFrac": 1.0237350165634558,
+        "foodB": 1203.8421888143114
+      }
+    },
+    {
+      "condition": "mate-choice-off",
+      "summary": {
+        "seed": 404,
+        "ticks": 4519,
+        "status": "extinct",
+        "extinctionTick": 4519,
+        "finalPop": 0,
+        "meanPop": 11.991189427312776,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 7,
+        "totalDeaths": 107
+      },
+      "initialHash": 691164819,
+      "finalHash": 3973014033,
+      "energyImbalance": -4.4292391976341605e-10,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 2150.4233745042834,
+            "foodB": 391.0041402372752,
+            "meanTemperature": 1,
+            "births": 5,
+            "deaths": 38,
+            "entries": 75,
+            "exits": 76
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 208,
+            "population": 0,
+            "foodA": 2256.4466592729195,
+            "foodB": 236.14553452563635,
+            "meanTemperature": 0.7599999964237184,
+            "births": 2,
+            "deaths": 35,
+            "entries": 37,
+            "exits": 41
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 208,
+            "population": 0,
+            "foodA": 1738.0034364750677,
+            "foodB": 574.1212600440824,
+            "meanTemperature": 1.0719999983906783,
+            "births": 0,
+            "deaths": 34,
+            "entries": 39,
+            "exits": 34
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            37,
+            39
+          ],
+          [
+            41,
+            0,
+            0
+          ],
+          [
+            34,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 0,
+        "plasticChange": 0,
+        "nicheMean": 0.003348214277951229,
+        "biomeMigrations": 151,
+        "foodFrac": 1.0059643069997908,
+        "foodB": 1201.2709348069932
+      }
+    },
+    {
+      "condition": "learning-off",
+      "summary": {
+        "seed": 404,
+        "ticks": 4762,
+        "status": "extinct",
+        "extinctionTick": 4762,
+        "finalPop": 0,
+        "meanPop": 10.254166666666666,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 6,
+        "totalDeaths": 106
+      },
+      "initialHash": 2027652221,
+      "finalHash": 309108404,
+      "energyImbalance": -1.9099388737231493e-10,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 2190.7394618991248,
+            "foodB": 389.39722374268285,
+            "meanTemperature": 1,
+            "births": 5,
+            "deaths": 36,
+            "entries": 91,
+            "exits": 94
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 208,
+            "population": 0,
+            "foodA": 2252.011401914165,
+            "foodB": 235.96015002439265,
+            "meanTemperature": 0.7599999964237184,
+            "births": 1,
+            "deaths": 35,
+            "entries": 39,
+            "exits": 42
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 208,
+            "population": 0,
+            "foodA": 1742.080000859309,
+            "foodB": 574.9124429266795,
+            "meanTemperature": 1.0719999983906783,
+            "births": 0,
+            "deaths": 35,
+            "entries": 55,
+            "exits": 49
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            39,
+            55
+          ],
+          [
+            42,
+            0,
+            0
+          ],
+          [
+            49,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 114,
+        "plasticChange": 0,
+        "nicheMean": 0.0029656370837828406,
+        "biomeMigrations": 185,
+        "foodFrac": 1.013289596483372,
+        "foodB": 1200.2698166937544
+      }
+    },
+    {
+      "condition": "perception-off",
+      "summary": {
+        "seed": 404,
+        "ticks": 3318,
+        "status": "extinct",
+        "extinctionTick": 3318,
+        "finalPop": 0,
+        "meanPop": 12.784431137724551,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 2,
+        "totalDeaths": 102
+      },
+      "initialHash": 141448470,
+      "finalHash": 1607713842,
+      "energyImbalance": -4.538378561846912e-10,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 2103.136234056763,
+            "foodB": 390.06141593226323,
+            "meanTemperature": 1,
+            "births": 2,
+            "deaths": 35,
+            "entries": 51,
+            "exits": 52
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 208,
+            "population": 0,
+            "foodA": 2384.6311891902133,
+            "foodB": 238.3804312129299,
+            "meanTemperature": 0.7599999964237184,
+            "births": 0,
+            "deaths": 39,
+            "entries": 30,
+            "exits": 28
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 208,
+            "population": 0,
+            "foodA": 1734.703142099647,
+            "foodB": 573.223843190156,
+            "meanTemperature": 1.0719999983906783,
+            "births": 0,
+            "deaths": 28,
+            "entries": 22,
+            "exits": 23
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            30,
+            22
+          ],
+          [
+            28,
+            0,
+            0
+          ],
+          [
+            23,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 0,
+        "plasticChange": 0,
+        "nicheMean": 0.003646220852883255,
+        "biomeMigrations": 103,
+        "foodFrac": 1.0150909269552624,
+        "foodB": 1201.6656903353496
+      }
+    },
+    {
+      "condition": "cultivation-off",
+      "summary": {
+        "seed": 404,
+        "ticks": 4952,
+        "status": "extinct",
+        "extinctionTick": 4952,
+        "finalPop": 0,
+        "meanPop": 10.51004016064257,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 7,
+        "totalDeaths": 107
+      },
+      "initialHash": 2592465175,
+      "finalHash": 2718923247,
+      "energyImbalance": -1.861735654529184e-9,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 2109.2775858972177,
+            "foodB": 383.28124379246395,
+            "meanTemperature": 1,
+            "births": 7,
+            "deaths": 40,
+            "entries": 64,
+            "exits": 65
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 208,
+            "population": 0,
+            "foodA": 2213.937403509809,
+            "foodB": 231.51866162113868,
+            "meanTemperature": 0.7599999964237184,
+            "births": 0,
+            "deaths": 31,
+            "entries": 32,
+            "exits": 38
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 208,
+            "population": 0,
+            "foodA": 1713.935242953732,
+            "foodB": 567.0698429392191,
+            "meanTemperature": 1.0719999983906783,
+            "births": 0,
+            "deaths": 36,
+            "entries": 33,
+            "exits": 26
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            32,
+            33
+          ],
+          [
+            38,
+            0,
+            0
+          ],
+          [
+            26,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 48,
+        "plasticChange": 0,
+        "nicheMean": 0,
+        "biomeMigrations": 129,
+        "foodFrac": 1.0058503988673253,
+        "foodB": 1181.8697483528201
+      }
+    },
+    {
+      "condition": "biomes-off",
+      "summary": {
+        "seed": 404,
+        "ticks": 3318,
+        "status": "extinct",
+        "extinctionTick": 3318,
+        "finalPop": 0,
+        "meanPop": 15.083832335329342,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 2,
+        "totalDeaths": 102
+      },
+      "initialHash": 1982136322,
+      "finalHash": 2454207112,
+      "energyImbalance": -2.53749021794647e-10,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": false,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 2104.283154317372,
+            "foodB": 389.94194316400774,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 0,
+            "entries": 0,
+            "exits": 0
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 208,
+            "population": 0,
+            "foodA": 2944.860129673688,
+            "foodB": 539.2353279681316,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 0,
+            "entries": 0,
+            "exits": 0
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 208,
+            "population": 0,
+            "foodA": 1599.657046530566,
+            "foodB": 315.728874217369,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 0,
+            "entries": 0,
+            "exits": 0
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 168,
+        "plasticChange": 0,
+        "nicheMean": 0.003967858248776247,
+        "biomeMigrations": 0,
+        "foodFrac": 1.031119347712174,
+        "foodB": 1244.9061453495074
+      }
+    },
+    {
+      "condition": "control",
+      "summary": {
+        "seed": 505,
+        "ticks": 5588,
+        "status": "extinct",
+        "extinctionTick": 5588,
+        "finalPop": 0,
+        "meanPop": 8.935943060498222,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 7,
+        "totalDeaths": 107
+      },
+      "initialHash": 3972711530,
+      "finalHash": 4183897064,
+      "energyImbalance": -2.5647750589996576e-10,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1291.0278998412998,
+            "foodB": 270.07243308000614,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 31,
+            "entries": 68,
+            "exits": 69
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 1152.3847839197938,
+            "foodB": 111.3294911933772,
+            "meanTemperature": 0.7599999964237184,
+            "births": 0,
+            "deaths": 39,
+            "entries": 36,
+            "exits": 33
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 2641.9704024219836,
+            "foodB": 815.815166389273,
+            "meanTemperature": 1.0719999983906783,
+            "births": 7,
+            "deaths": 37,
+            "entries": 33,
+            "exits": 35
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            36,
+            33
+          ],
+          [
+            33,
+            0,
+            0
+          ],
+          [
+            35,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 3880,
+        "plasticChange": 0,
+        "nicheMean": 0.002922936917142889,
+        "biomeMigrations": 137,
+        "foodFrac": 1.0149313120574206,
+        "foodB": 1197.2170906626563
+      }
+    },
+    {
+      "condition": "communication-off",
+      "summary": {
+        "seed": 505,
+        "ticks": 3145,
+        "status": "extinct",
+        "extinctionTick": 3145,
+        "finalPop": 0,
+        "meanPop": 15.861635220125786,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 4,
+        "totalDeaths": 104
+      },
+      "initialHash": 2360169637,
+      "finalHash": 788952237,
+      "energyImbalance": -1.8098944565281272e-10,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1318.5304878030777,
+            "foodB": 272.9754554003156,
+            "meanTemperature": 1,
+            "births": 2,
+            "deaths": 29,
+            "entries": 85,
+            "exits": 90
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 1168.5702205296848,
+            "foodB": 112.92171046608122,
+            "meanTemperature": 0.7599999964237184,
+            "births": 0,
+            "deaths": 37,
+            "entries": 54,
+            "exits": 53
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 2701.977951225041,
+            "foodB": 827.2581646634947,
+            "meanTemperature": 1.0719999983906783,
+            "births": 2,
+            "deaths": 38,
+            "entries": 36,
+            "exits": 32
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            54,
+            36
+          ],
+          [
+            53,
+            0,
+            0
+          ],
+          [
+            32,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 1696,
+        "plasticChange": 0,
+        "nicheMean": 0.005392304246298704,
+        "biomeMigrations": 175,
+        "foodFrac": 1.0190138844468952,
+        "foodB": 1213.1553305298903
+      }
+    },
+    {
+      "condition": "mate-choice-off",
+      "summary": {
+        "seed": 505,
+        "ticks": 3390,
+        "status": "extinct",
+        "extinctionTick": 3390,
+        "finalPop": 0,
+        "meanPop": 13.573099415204679,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 7,
+        "totalDeaths": 107
+      },
+      "initialHash": 2695349087,
+      "finalHash": 3217183669,
+      "energyImbalance": 3.5015546018257737e-10,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1420.8898962249302,
+            "foodB": 271.7087989037491,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 33,
+            "entries": 80,
+            "exits": 79
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 1161.685069699886,
+            "foodB": 112.09454624846441,
+            "meanTemperature": 0.7599999964237184,
+            "births": 0,
+            "deaths": 39,
+            "entries": 33,
+            "exits": 30
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 2678.404202430635,
+            "foodB": 816.7749269461856,
+            "meanTemperature": 1.0719999983906783,
+            "births": 7,
+            "deaths": 35,
+            "entries": 46,
+            "exits": 50
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            33,
+            46
+          ],
+          [
+            30,
+            0,
+            0
+          ],
+          [
+            50,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 0,
+        "plasticChange": 0,
+        "nicheMean": 0.003795838036401426,
+        "biomeMigrations": 159,
+        "foodFrac": 1.0383503866641648,
+        "foodB": 1200.5782720983996
+      }
+    },
+    {
+      "condition": "learning-off",
+      "summary": {
+        "seed": 505,
+        "ticks": 4864,
+        "status": "extinct",
+        "extinctionTick": 4864,
+        "finalPop": 0,
+        "meanPop": 10.159183673469387,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 3,
+        "totalDeaths": 103
+      },
+      "initialHash": 3666116969,
+      "finalHash": 3840551911,
+      "energyImbalance": -4.793037078343332e-10,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1296.7137782868979,
+            "foodB": 270.51816905193846,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 36,
+            "entries": 80,
+            "exits": 76
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 1152.159677553694,
+            "foodB": 111.31776184629432,
+            "meanTemperature": 0.7599999964237184,
+            "births": 0,
+            "deaths": 31,
+            "entries": 28,
+            "exits": 33
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 2644.8872593422443,
+            "foodB": 819.5238662788321,
+            "meanTemperature": 1.0719999983906783,
+            "births": 3,
+            "deaths": 36,
+            "entries": 48,
+            "exits": 47
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            28,
+            48
+          ],
+          [
+            33,
+            0,
+            0
+          ],
+          [
+            47,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 3113,
+        "plasticChange": 0,
+        "nicheMean": 0.004141271253749346,
+        "biomeMigrations": 156,
+        "foodFrac": 1.0095031312947749,
+        "foodB": 1201.3597971770655
+      }
+    },
+    {
+      "condition": "perception-off",
+      "summary": {
+        "seed": 505,
+        "ticks": 3438,
+        "status": "extinct",
+        "extinctionTick": 3438,
+        "finalPop": 0,
+        "meanPop": 15.445086705202312,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 4,
+        "totalDeaths": 104
+      },
+      "initialHash": 3763380670,
+      "finalHash": 2827490171,
+      "energyImbalance": 2.000888343900442e-11,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1423.8248028578953,
+            "foodB": 274.16690391268924,
+            "meanTemperature": 1,
+            "births": 1,
+            "deaths": 30,
+            "entries": 65,
+            "exits": 68
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 1276.8378938869532,
+            "foodB": 113.39127258730932,
+            "meanTemperature": 0.7599999964237184,
+            "births": 0,
+            "deaths": 42,
+            "entries": 47,
+            "exits": 41
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 2679.291787631097,
+            "foodB": 824.5666596165478,
+            "meanTemperature": 1.0719999983906783,
+            "births": 3,
+            "deaths": 32,
+            "entries": 21,
+            "exits": 24
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            47,
+            21
+          ],
+          [
+            41,
+            0,
+            0
+          ],
+          [
+            24,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 7755,
+        "plasticChange": 0,
+        "nicheMean": 0.005010999071250568,
+        "biomeMigrations": 133,
+        "foodFrac": 1.0516240726466137,
+        "foodB": 1212.1248361165465
+      }
+    },
+    {
+      "condition": "cultivation-off",
+      "summary": {
+        "seed": 505,
+        "ticks": 4924,
+        "status": "extinct",
+        "extinctionTick": 4924,
+        "finalPop": 0,
+        "meanPop": 14.80241935483871,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 23,
+        "totalDeaths": 123
+      },
+      "initialHash": 276826195,
+      "finalHash": 4105889926,
+      "energyImbalance": -1.0659277904778719e-9,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1271.2870655844342,
+            "foodB": 265.2514903759583,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 36,
+            "entries": 98,
+            "exits": 94
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 1120.9556886485434,
+            "foodB": 108.7278049281653,
+            "meanTemperature": 0.7599999964237184,
+            "births": 1,
+            "deaths": 39,
+            "entries": 44,
+            "exits": 42
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 2580.1837075120766,
+            "foodB": 803.8442850096613,
+            "meanTemperature": 1.0719999983906783,
+            "births": 22,
+            "deaths": 48,
+            "entries": 50,
+            "exits": 56
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            44,
+            50
+          ],
+          [
+            42,
+            0,
+            0
+          ],
+          [
+            56,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 5241,
+        "plasticChange": 0,
+        "nicheMean": 0,
+        "biomeMigrations": 192,
+        "foodFrac": 1.0114606830188717,
+        "foodB": 1177.8235803137861
+      }
+    },
+    {
+      "condition": "biomes-off",
+      "summary": {
+        "seed": 505,
+        "ticks": 10000,
+        "status": "running",
+        "extinctionTick": null,
+        "finalPop": 161,
+        "meanPop": 102.12574850299401,
+        "minPop": 6,
+        "maxPop": 172,
+        "maxGeneration": 20,
+        "meanTraits": {
+          "size": 0.4744908287658455,
+          "speed": 0.3991713914441766,
+          "sense": 0.4309314833664746,
+          "reproThreshold": 0.675841646535056,
+          "investment": 0.3353152162169818,
+          "maturity": 0.5857660616776958,
+          "coldTolerance": 0.5417855183900513,
+          "bite": 0.5297685539500313,
+          "hue": 0.9301891260265563,
+          "memory": 0.616949671173688,
+          "diet": 0.03093566073347693,
+          "plantSpecialization": 0.288399328726419,
+          "matePreference": 0.45017303905872086,
+          "mateSelectivity": 0.7179041867670806,
+          "plasticity": 0.5838510347819477,
+          "nicheInvestment": 0.7019215055874416
+        },
+        "diversity": 0.035523632269449344,
+        "carnFrac": 0,
+        "cladeTop": 1,
+        "cladeCount": 1,
+        "predRate": 4.166666666666667,
+        "totalBirths": 998,
+        "totalDeaths": 937
+      },
+      "initialHash": 536607801,
+      "finalHash": 3183485228,
+      "energyImbalance": -1.0113581083714962e-9,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": false,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 42,
+            "foodA": 509.2222527257802,
+            "foodB": 136.07617244778908,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 0,
+            "entries": 0,
+            "exits": 0
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 46,
+            "foodA": 495.9975749495252,
+            "foodB": 108.56547920337803,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 0,
+            "entries": 0,
+            "exits": 0
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 73,
+            "foodA": 544.9770368282228,
+            "foodB": 237.3052250014769,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 0,
+            "entries": 0,
+            "exits": 0
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0.7146878000797113,
+        "mateRejected": 758,
+        "plasticChange": 0.03455254333325414,
+        "nicheMean": 0.003821624938925379,
+        "biomeMigrations": 0,
+        "foodFrac": 0.3403979495404986,
+        "foodB": 481.94687665264405
+      }
+    },
+    {
+      "condition": "control",
+      "summary": {
+        "seed": 606,
+        "ticks": 10000,
+        "status": "running",
+        "extinctionTick": null,
+        "finalPop": 209,
+        "meanPop": 117.87425149700599,
+        "minPop": 14,
+        "maxPop": 220,
+        "maxGeneration": 29,
+        "meanTraits": {
+          "size": 0.35484850007381163,
+          "speed": 0.44449950391025633,
+          "sense": 0.42290535982716027,
+          "reproThreshold": 0.4870311433903909,
+          "investment": 0.22869961159793953,
+          "maturity": 0.4113376357338645,
+          "coldTolerance": 0.3040185252730356,
+          "bite": 0.5857335127284082,
+          "hue": 0.554287652507353,
+          "memory": 0.2740241215702449,
+          "diet": 0.049661027846866816,
+          "plantSpecialization": 0.26214428723714,
+          "matePreference": 0.48888933116739447,
+          "mateSelectivity": 0.5266043137420308,
+          "plasticity": 0.31239814756874834,
+          "nicheInvestment": 0.29753873493682825
+        },
+        "diversity": 0.07249411104310824,
+        "carnFrac": 0,
+        "cladeTop": 1,
+        "cladeCount": 1,
+        "predRate": 33.333333333333336,
+        "totalBirths": 2177,
+        "totalDeaths": 2068
+      },
+      "initialHash": 1103753845,
+      "finalHash": 2137630513,
+      "energyImbalance": 6.803020369261503e-10,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 69,
+            "foodA": 787.5006537137161,
+            "foodB": 267.8526838893316,
+            "meanTemperature": 1,
+            "births": 585,
+            "deaths": 633,
+            "entries": 3138,
+            "exits": 3052
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 75,
+            "foodA": 1189.2425134469077,
+            "foodB": 161.07780132233214,
+            "meanTemperature": 0.7599999964237184,
+            "births": 665,
+            "deaths": 482,
+            "entries": 2488,
+            "exits": 2634
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 65,
+            "foodA": 760.5771020287926,
+            "foodB": 368.18520709316107,
+            "meanTemperature": 1.0719999983906783,
+            "births": 927,
+            "deaths": 953,
+            "entries": 564,
+            "exits": 504
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            2488,
+            564
+          ],
+          [
+            2634,
+            0,
+            0
+          ],
+          [
+            504,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0.4043315813924591,
+        "mateRejected": 713,
+        "plasticChange": 0.016279088418918335,
+        "nicheMean": 0.058257380498945716,
+        "biomeMigrations": 6190,
+        "foodFrac": 0.41231295745549984,
+        "foodB": 797.1156923048251
+      }
+    },
+    {
+      "condition": "communication-off",
+      "summary": {
+        "seed": 606,
+        "ticks": 10000,
+        "status": "running",
+        "extinctionTick": null,
+        "finalPop": 34,
+        "meanPop": 28.768463073852296,
+        "minPop": 13,
+        "maxPop": 100,
+        "maxGeneration": 19,
+        "meanTraits": {
+          "size": 0.4639519786133486,
+          "speed": 0.7346270207096549,
+          "sense": 0.28443871876772714,
+          "reproThreshold": 0.36439649848377004,
+          "investment": 0.25275446868994655,
+          "maturity": 0.6003228566225838,
+          "coldTolerance": 0.6372845716336194,
+          "bite": 0.8029733089839711,
+          "hue": 0.9162104760899263,
+          "memory": 0.6367495357990265,
+          "diet": 0.006852849824901889,
+          "plantSpecialization": 0.8406470996492049,
+          "matePreference": 0.5045496225357056,
+          "mateSelectivity": 0.7803204830955056,
+          "plasticity": 0.1725692117915434,
+          "nicheInvestment": 0.16726729975027196
+        },
+        "diversity": 0.012262189436141031,
+        "carnFrac": 0,
+        "cladeTop": 1,
+        "cladeCount": 1,
+        "predRate": 0,
+        "totalBirths": 266,
+        "totalDeaths": 332
+      },
+      "initialHash": 515861952,
+      "finalHash": 107955160,
+      "energyImbalance": -2.546585164964199e-10,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 24,
+            "foodA": 889.1842084883126,
+            "foodB": 155.62488166013696,
+            "meanTemperature": 1,
+            "births": 198,
+            "deaths": 153,
+            "entries": 1621,
+            "exits": 1673
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 10,
+            "foodA": 1915.0804776182881,
+            "foodB": 195.591672827339,
+            "meanTemperature": 0.7599999964237184,
+            "births": 68,
+            "deaths": 145,
+            "entries": 1657,
+            "exits": 1608
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 1536.956080471772,
+            "foodB": 497.58697761880916,
+            "meanTemperature": 1.0719999983906783,
+            "births": 0,
+            "deaths": 34,
+            "entries": 16,
+            "exits": 13
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            1657,
+            16
+          ],
+          [
+            1608,
+            0,
+            0
+          ],
+          [
+            13,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 46,
+        "plasticChange": 0.007528210537489849,
+        "nicheMean": 0.008701045599210375,
+        "biomeMigrations": 3294,
+        "foodFrac": 0.7730320466141871,
+        "foodB": 848.803532106285
+      }
+    },
+    {
+      "condition": "mate-choice-off",
+      "summary": {
+        "seed": 606,
+        "ticks": 10000,
+        "status": "running",
+        "extinctionTick": null,
+        "finalPop": 346,
+        "meanPop": 203.67265469061877,
+        "minPop": 18,
+        "maxPop": 357,
+        "maxGeneration": 28,
+        "meanTraits": {
+          "size": 0.2667862248816931,
+          "speed": 0.6194182758386424,
+          "sense": 0.3251903081215875,
+          "reproThreshold": 0.595219385072675,
+          "investment": 0.4570989454585004,
+          "maturity": 0.5153700073674924,
+          "coldTolerance": 0.32317622750997543,
+          "bite": 0.3412134109893975,
+          "hue": 0.5925219782515069,
+          "memory": 0.47199531920211163,
+          "diet": 0.015025573565942273,
+          "plantSpecialization": 0.24772113225708117,
+          "matePreference": 0.4536608468762712,
+          "mateSelectivity": 0.49732670179336746,
+          "plasticity": 0.30393495020924965,
+          "nicheInvestment": 0.35427363996388594
+        },
+        "diversity": 0.1047265531653056,
+        "carnFrac": 0,
+        "cladeTop": 0.8872832369942196,
+        "cladeCount": 2,
+        "predRate": 0,
+        "totalBirths": 2868,
+        "totalDeaths": 2622
+      },
+      "initialHash": 4021407934,
+      "finalHash": 3655070427,
+      "energyImbalance": -1.9335857359692454e-9,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 103,
+            "foodA": 548.0116039551191,
+            "foodB": 221.3827391750364,
+            "meanTemperature": 1,
+            "births": 795,
+            "deaths": 706,
+            "entries": 5800,
+            "exits": 5817
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 126,
+            "foodA": 526.1993036611389,
+            "foodB": 119.33502405971299,
+            "meanTemperature": 0.7599999964237184,
+            "births": 984,
+            "deaths": 496,
+            "entries": 4167,
+            "exits": 4567
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 117,
+            "foodA": 670.0923391753428,
+            "foodB": 458.6094509537423,
+            "meanTemperature": 1.0719999983906783,
+            "births": 1089,
+            "deaths": 1420,
+            "entries": 1650,
+            "exits": 1233
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            4167,
+            1650
+          ],
+          [
+            4567,
+            0,
+            0
+          ],
+          [
+            1233,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0.4032189797457318,
+        "mateRejected": 0,
+        "plasticChange": 0.014779475877175298,
+        "nicheMean": 0.06923198906257749,
+        "biomeMigrations": 11617,
+        "foodFrac": 0.2831363728252802,
+        "foodB": 799.3272141884918
+      }
+    },
+    {
+      "condition": "learning-off",
+      "summary": {
+        "seed": 606,
+        "ticks": 5324,
+        "status": "extinct",
+        "extinctionTick": 5324,
+        "finalPop": 0,
+        "meanPop": 12.985074626865671,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 31,
+        "totalDeaths": 131
+      },
+      "initialHash": 3969714884,
+      "finalHash": 1760672297,
+      "energyImbalance": -5.547917680814862e-10,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1655.2172643650708,
+            "foodB": 299.904360344314,
+            "meanTemperature": 1,
+            "births": 19,
+            "deaths": 49,
+            "entries": 191,
+            "exits": 192
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 2388.5887028503103,
+            "foodB": 241.66249689098518,
+            "meanTemperature": 0.7599999964237184,
+            "births": 12,
+            "deaths": 48,
+            "entries": 179,
+            "exits": 181
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 1536.882614110121,
+            "foodB": 499.54180345120955,
+            "meanTemperature": 1.0719999983906783,
+            "births": 0,
+            "deaths": 34,
+            "entries": 13,
+            "exits": 10
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            179,
+            13
+          ],
+          [
+            181,
+            0,
+            0
+          ],
+          [
+            10,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 364,
+        "plasticChange": 0,
+        "nicheMean": 0.003478635320096521,
+        "biomeMigrations": 383,
+        "foodFrac": 1.0159225851764384,
+        "foodB": 1041.1086606865072
+      }
+    },
+    {
+      "condition": "perception-off",
+      "summary": {
+        "seed": 606,
+        "ticks": 3422,
+        "status": "extinct",
+        "extinctionTick": 3422,
+        "finalPop": 0,
+        "meanPop": 14.76878612716763,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 7,
+        "totalDeaths": 107
+      },
+      "initialHash": 1130444557,
+      "finalHash": 1785451282,
+      "energyImbalance": 8.36735125631094e-11,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1613.7137643287028,
+            "foodB": 301.438454771511,
+            "meanTemperature": 1,
+            "births": 1,
+            "deaths": 37,
+            "entries": 75,
+            "exits": 70
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 2385.376303700708,
+            "foodB": 241.65382681519324,
+            "meanTemperature": 0.7599999964237184,
+            "births": 5,
+            "deaths": 38,
+            "entries": 51,
+            "exits": 56
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 1557.7827364883337,
+            "foodB": 504.0737680496677,
+            "meanTemperature": 1.0719999983906783,
+            "births": 1,
+            "deaths": 32,
+            "entries": 19,
+            "exits": 19
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            51,
+            19
+          ],
+          [
+            56,
+            0,
+            0
+          ],
+          [
+            19,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 138,
+        "plasticChange": 0,
+        "nicheMean": 0.003424573871123039,
+        "biomeMigrations": 145,
+        "foodFrac": 1.0135133100725908,
+        "foodB": 1047.166049636372
+      }
+    },
+    {
+      "condition": "cultivation-off",
+      "summary": {
+        "seed": 606,
+        "ticks": 3531,
+        "status": "extinct",
+        "extinctionTick": 3531,
+        "finalPop": 0,
+        "meanPop": 19.882022471910112,
+        "minPop": 0,
+        "maxPop": 100,
+        "maxGeneration": 0,
+        "meanTraits": {
+          "size": 0,
+          "speed": 0,
+          "sense": 0,
+          "reproThreshold": 0,
+          "investment": 0,
+          "maturity": 0,
+          "coldTolerance": 0,
+          "bite": 0,
+          "hue": 0,
+          "memory": 0,
+          "diet": 0,
+          "plantSpecialization": 0,
+          "matePreference": 0,
+          "mateSelectivity": 0,
+          "plasticity": 0,
+          "nicheInvestment": 0
+        },
+        "diversity": 0,
+        "carnFrac": 0,
+        "cladeTop": 0,
+        "cladeCount": 0,
+        "predRate": 0,
+        "totalBirths": 31,
+        "totalDeaths": 131
+      },
+      "initialHash": 873743074,
+      "finalHash": 1694825059,
+      "energyImbalance": -4.129105946049094e-10,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": true,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 0,
+            "foodA": 1565.4998551921706,
+            "foodB": 291.64732638775314,
+            "meanTemperature": 1,
+            "births": 6,
+            "deaths": 44,
+            "entries": 130,
+            "exits": 123
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 0,
+            "foodA": 2376.571869405239,
+            "foodB": 237.03409233249658,
+            "meanTemperature": 0.7599999964237184,
+            "births": 5,
+            "deaths": 37,
+            "entries": 100,
+            "exits": 106
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 1555.4470088421347,
+            "foodB": 490.782838760592,
+            "meanTemperature": 1.0719999983906783,
+            "births": 20,
+            "deaths": 50,
+            "entries": 23,
+            "exits": 24
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            100,
+            23
+          ],
+          [
+            106,
+            0,
+            0
+          ],
+          [
+            24,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0,
+        "mateRejected": 286,
+        "plasticChange": 0,
+        "nicheMean": 0,
+        "biomeMigrations": 253,
+        "foodFrac": 1.0202609608861204,
+        "foodB": 1019.4642574808393
+      }
+    },
+    {
+      "condition": "biomes-off",
+      "summary": {
+        "seed": 606,
+        "ticks": 10000,
+        "status": "running",
+        "extinctionTick": null,
+        "finalPop": 71,
+        "meanPop": 29.882235528942115,
+        "minPop": 6,
+        "maxPop": 100,
+        "maxGeneration": 22,
+        "meanTraits": {
+          "size": 0.2578710804522877,
+          "speed": 0.4260216842234974,
+          "sense": 0.2809765101738379,
+          "reproThreshold": 0.36610266188500634,
+          "investment": 0.22556651855858278,
+          "maturity": 0.3934862945281284,
+          "coldTolerance": 0.38148049233664927,
+          "bite": 0.3420009671802252,
+          "hue": 0.8605974047956332,
+          "memory": 0.47275669432022205,
+          "diet": 0.035361518086472025,
+          "plantSpecialization": 0.41073928458589903,
+          "matePreference": 0.3290966828943978,
+          "mateSelectivity": 0.7492816481791752,
+          "plasticity": 0.3254377015039954,
+          "nicheInvestment": 0.8477293194179804
+        },
+        "diversity": 0.040066131751262724,
+        "carnFrac": 0,
+        "cladeTop": 1,
+        "cladeCount": 1,
+        "predRate": 50,
+        "totalBirths": 533,
+        "totalDeaths": 562
+      },
+      "initialHash": 4170487018,
+      "finalHash": 64589660,
+      "energyImbalance": -3.8562575355172157e-10,
+      "observationsImmutable": true,
+      "resumeExact": null,
+      "biomes": {
+        "enabled": false,
+        "contrast": 0.6,
+        "biomes": [
+          {
+            "id": 0,
+            "label": "Umiarkowany",
+            "cells": 209,
+            "population": 47,
+            "foodA": 1786.1776504589425,
+            "foodB": 335.6571862423206,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 0,
+            "entries": 0,
+            "exits": 0
+          },
+          {
+            "id": 1,
+            "label": "Chłodny",
+            "cells": 206,
+            "population": 24,
+            "foodA": 3267.151232390794,
+            "foodB": 637.1755544180546,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 0,
+            "entries": 0,
+            "exits": 0
+          },
+          {
+            "id": 2,
+            "label": "Ciepły",
+            "cells": 210,
+            "population": 0,
+            "foodA": 1365.6003088204898,
+            "foodB": 270.2731104279001,
+            "meanTemperature": 1,
+            "births": 0,
+            "deaths": 0,
+            "entries": 0,
+            "exits": 0
+          }
+        ],
+        "migrations": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "counters": {
+        "meanSignal": 0.8283739998726778,
+        "mateRejected": 146,
+        "plasticChange": 0.02101224964311849,
+        "nicheMean": 0.04650631162490863,
+        "biomeMigrations": 0,
+        "foodFrac": 0.8955145815662398,
+        "foodB": 1243.1058510882751
+      }
+    }
+  ]
+}

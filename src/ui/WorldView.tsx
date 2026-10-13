@@ -12,6 +12,8 @@ const COLOR_MODES: { id: ColorMode; label: string; hint: string }[] = [
   { id: 'generation', label: 'Pokolenie', hint: 'Starsze pokolenia: fiolet/niebieski, najmłodsze: czerwony' },
   { id: 'age', label: 'Wiek', hint: 'Zielony = młody, czerwony = bliski końca życia' },
   { id: 'diet', label: 'Dieta', hint: 'Zielony = roślinożerca, czerwony = drapieżnik' },
+  { id: 'signal', label: 'Sygnał', hint: 'Niebieski = sygnał dodatni, różowy = ujemny; znaczenie sygnału nie jest zaprogramowane' },
+  { id: 'specialization', label: 'Pokarm A/B', hint: 'Turkus = specjalizacja A, bursztyn = specjalizacja B' },
   { id: 'clade', label: 'Klad', hint: 'Każdy założyciel ma własny kolor — widać, czyje potomstwo przetrwało' },
 ];
 
@@ -45,9 +47,12 @@ export function WorldView({ client }: { client: WorldClient }) {
   const [showTraj, setShowTraj] = useState(true);
   const [follow, setFollow] = useState(false);
   const [showDensity, setShowDensity] = useState(false);
+  const [showSignals, setShowSignals] = useState(true);
+  const [showNiche, setShowNiche] = useState(false);
+  const [environmentMap,setEnvironmentMap] = useState<'none'|'biome'|'temperature'>('none');
   const [err, setErr] = useState<string | null>(null);
-  const opts = useRef({ showFood, showTraj, follow, showDensity });
-  opts.current = { showFood, showTraj, follow, showDensity };
+  const opts = useRef({ showFood, showTraj, follow, showDensity, showSignals, showNiche, environmentMap });
+  opts.current = { showFood, showTraj, follow, showDensity, showSignals, showNiche, environmentMap };
 
   const size = () => {
     const b = boxRef.current!;
@@ -64,6 +69,9 @@ export function WorldView({ client }: { client: WorldClient }) {
       if (st.pending.fert) r.setFert(st.pending.fert);
       r.setOrganisms(st.pending.data, st.pending.n);
       r.setFood(st.pending.food);
+      const empty = new Uint8Array(st.pending.food.length);
+      r.setLayers(st.pending.foodB ?? empty, st.pending.obstacles ?? empty, st.pending.niche ?? empty);
+      r.setEnvironment(st.pending.biome ?? empty, st.pending.localTemperature ?? new Float32Array(empty.length));
       st.last = st.pending;
       st.pending = null;
       client.ack();
@@ -73,7 +81,7 @@ export function WorldView({ client }: { client: WorldClient }) {
       st.view.cx += (f.selected.x - st.view.cx) * 0.25;
       st.view.cy += (f.selected.y - st.view.cy) * 0.25;
     }
-    r.render(st.view, w, h, dpr, { showFood: opts.current.showFood, sensors: client.view.sensors, energy: client.view.energy });
+    r.render(st.view, w, h, dpr, { showFood: opts.current.showFood, showNiche: opts.current.showNiche, environmentMap: opts.current.environmentMap, sensors: client.view.sensors, energy: client.view.energy });
 
     // — nakładka 2D —
     const ov = ovRef.current!;
@@ -110,6 +118,13 @@ export function WorldView({ client }: { client: WorldClient }) {
           c.fillRect(toX(bx * B), toY(by * B), B * z + 0.5, B * z + 0.5);
         }
     }
+    if (opts.current.showSignals && f?.signals) {
+      for (let i = 0; i < f.n; i++) {
+        const signal = f.signals[i], amplitude = Math.abs(signal); if (amplitude < 0.08) continue;
+        c.strokeStyle = signal >= 0 ? `rgba(100,170,255,${Math.min(0.7, amplitude * 0.7)})` : `rgba(255,120,190,${Math.min(0.7, amplitude * 0.7)})`; c.lineWidth = 1.5;
+        c.beginPath(); c.arc(toX(f.data[i * 8]), toY(f.data[i * 8 + 1]), Math.max(3, (f.data[i * 8 + 2] + 6 * amplitude) * z), 0, Math.PI * 2); c.stroke();
+      }
+    }
     const sel = f?.selected;
     if (sel) {
       if (st.trajId !== sel.id) {
@@ -141,7 +156,10 @@ export function WorldView({ client }: { client: WorldClient }) {
       c.setLineDash([4, 5]);
       c.strokeStyle = 'rgba(100,230,210,0.55)';
       c.beginPath();
-      c.arc(sx, sy, sel.sense * z, 0, Math.PI * 2);
+      const halfField = Math.acos(Math.max(-1, Math.min(1, client.info?.params.viewCos ?? -1)));
+      const heading = Math.atan2(sel.hy, sel.hx);
+      c.arc(sx, sy, sel.sense * z, heading - halfField, heading + halfField);
+      if (halfField < Math.PI) { c.lineTo(sx, sy); c.closePath(); }
       c.stroke();
       c.setLineDash([]);
       c.strokeStyle = 'rgba(100,230,210,0.9)';
@@ -211,12 +229,15 @@ export function WorldView({ client }: { client: WorldClient }) {
     rend.current.setWorld(client.setup.width, client.setup.height, client.grid.nx, client.grid.ny, client.grid.fert);
     L.current.last = null;
     L.current.pending = null;
+    L.current.traj = []; L.current.trajId = null;
     fit();
   }, [client, client.worldEpoch, client.ready, fit]);
 
+  useEffect(() => { const state = L.current; state.traj = []; state.trajId = null; state.last = null; if (state.pending) { state.pending = null; client.ack(); } rend.current?.setOrganisms(new Float32Array(0), 0); client.setView({}); schedule(); }, [client.historyEpoch, client, schedule]);
+
   useEffect(() => {
     schedule();
-  }, [showFood, showTraj, follow, showDensity, client.view, schedule]);
+  }, [showFood, showTraj, follow, showDensity, showSignals, showNiche, environmentMap, client.view, schedule]);
 
   // — interakcje —
   const onPointerDown = (e: React.PointerEvent) => {
@@ -313,9 +334,11 @@ export function WorldView({ client }: { client: WorldClient }) {
         </>
       )}
       <div className="hud tl">
-        {chip(showFood, 'Zasoby', () => setShowFood(!showFood), 'Rozkład zasobów (jaśniej = więcej pokarmu)')}
+        {chip(showFood, 'Zasoby', () => setShowFood(!showFood), 'Turkus = pokarm A, bursztyn = pokarm B; jaśniej = więcej zasobów')}
         {chip(client.view.sensors, 'Sensory', () => client.setView({ sensors: !client.view.sensors }), 'Zasięg sensorów wszystkich organizmów')}
         {chip(client.view.energy, 'Energia', () => client.setView({ energy: !client.view.energy }), 'Jasny rdzeń proporcjonalny do energii')}
+        {chip(showSignals, 'Sygnały', () => setShowSignals(!showSignals), 'Niebieski dodatni / różowy ujemny sygnał; znakom nie przypisano znaczenia')}
+        {chip(showNiche, 'Nisza', () => setShowNiche(!showNiche), 'Fiolet = zmiana żyzności przez kultywację')}
         {chip(showTraj, 'Ślad', () => setShowTraj(!showTraj), 'Trajektoria zaznaczonego organizmu')}
         {chip(showDensity, 'Gęstość', () => setShowDensity(!showDensity), 'Mapa cieplna zagęszczenia organizmów')}
         {chip(follow, 'Podążaj', () => setFollow(!follow), 'Kamera śledzi zaznaczony organizm')}
@@ -325,6 +348,7 @@ export function WorldView({ client }: { client: WorldClient }) {
         <Help id="ui.overlays" className="hud-help" />
       </div>
       <div className="hud tr">
+        <label className="select-wrap"><span>Mapa</span><select value={environmentMap} onChange={e=>setEnvironmentMap(e.target.value as typeof environmentMap)}><option value="none">Zasoby</option><option value="biome">Biomy</option><option value="temperature">Temperatura</option></select></label>
         <label className="select-wrap" title={COLOR_MODES.find((m) => m.id === client.view.colorMode)?.hint}>
           <span>Kolor</span>
           <select value={client.view.colorMode} onChange={(e) => client.setView({ colorMode: e.target.value as ColorMode })}>
@@ -344,6 +368,7 @@ export function WorldView({ client }: { client: WorldClient }) {
         </div>
       )}
       <div className="hud bl">
+        <span className="world-legend">{environmentMap==='biome' ? `Umiarkowany · zielony / chłodny · niebieski / ciepły · pomarańczowy${(info?.params.biomes??0)<0.5?' · moduł wyłączony':''}` : environmentMap==='temperature' ? 'Temperatura: niebieski 0 → czerwony 1,2 · względna skala modelu' : 'A · turkus / B · bursztyn / bariery · szare'}</span>
         <Help id="ui.world" className="hud-help" />
       </div>
       {!client.ready && <div className="empty">Inicjalizacja świata…</div>}

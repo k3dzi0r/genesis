@@ -1642,3 +1642,44 @@ label.inline input {
 .lesson > header .hint {
   white-space: nowrap;
 }
+
+/* Research tools remain reachable when the side panel is narrow. */
+.side.right > .tabs { flex-wrap: wrap; overflow-x: visible; }
+.side.right > .tabs button { flex: 1 0 30%; padding: 8px 5px; }
+.controls-fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+.controls-fieldset:disabled { opacity: .6; }
+.controls-fieldset:disabled button, .controls-fieldset:disabled input { cursor: not-allowed; }
+.world-legend { color: var(--dim); font-size: 10px; padding: 4px 6px; background: rgba(8,13,18,.8); border-radius: 4px; }
+.network-toggle { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; font-size: 12px; }
+.panel-body select { max-width: 100%; }
+.card > select { width: 100%; margin: 10px 0; }
+.card table { width: 100%; border-collapse: collapse; font: 11px var(--mono); }
+.card td, .card th { padding: 6px 4px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+.card th { color: var(--dim); font-weight: 500; }
+.hud.tl { max-width: calc(100% - 125px); flex-wrap: wrap; }
+@media (max-width: 760px) {
+ .world-legend { display: none; }
+ .toolbar { gap: 4px; }
+ .toolbar .readout.dim { display: none; }
+ .side.right > .tabs button { font-size: 10px; }
+}
+.hud.tl { max-width: calc(100% - 20px); }
+.hud.tr { top: auto; bottom: 12px; }
+.world-legend { max-width: 270px; }
+.side.left > .tabs { flex-wrap: wrap; overflow: visible; }
+.side.left > .tabs button { flex: 1 0 30%; padding: 8px 5px; }
+.module-row { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.module-row label, .presentation-tool { display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; }
+.module-row label { flex: 1; }
+.module-row input, .presentation-tool input { width: 16px; height: 16px; accent-color: var(--accent); flex: none; }
+.module-row p { flex-basis: 100%; color: var(--dim); font-size: 11px; line-height: 1.45; margin: 0 0 0 24px; }
+.presentation-tool { padding: 8px 0; }
+.advanced-controls > summary { cursor: pointer; padding: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; font-size: 12px; }
+.advanced-controls > .card { margin-top: 10px; }
+.guided-live { flex: none; }
+.guided-live progress { width: 100%; height: 8px; accent-color: var(--accent); }
+.guided-metric { padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 12px; }
+.guided-live .field { display: flex; flex-direction: column; gap: 6px; margin: 12px 0; font-size: 12px; }
+.guided-live textarea { min-height: 80px; resize: vertical; width: 100%; }
+.hud.tr { flex-wrap: wrap; justify-content: flex-end; max-width: calc(100% - 25px); }
+.world-legend { white-space: normal; }

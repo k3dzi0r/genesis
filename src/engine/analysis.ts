@@ -134,24 +134,28 @@ function evaluate(genomes: Float32Array, n: number): { means: number[]; fraction
   return { means, fractions, sds };
 }
 
-let baselineCache: { means: number[]; sds: number[]; n: number } | null = null;
+const baselineCache = new Map<number, { means: number[]; sds: number[]; n: number }>();
 
 /** Baseline: te same sondy na losowych sieciach o rozkładzie wag założycieli. */
 function baseline(weightSd: number): { means: number[]; sds: number[]; n: number } {
-  if (baselineCache) return baselineCache;
+  const cached = baselineCache.get(weightSd);
+  if (cached) return cached;
   const n = 2000;
   const g = new Float32Array(n * GENOME_LEN);
   const rng = new Rng(0xbadc0de);
   for (let i = 0; i < n; i++) randomGenome(rng, g, i * GENOME_LEN, weightSd);
   const e = evaluate(g, n);
-  baselineCache = { means: e.means, sds: e.sds, n };
-  return baselineCache;
+  const result = { means: e.means, sds: e.sds, n };
+  baselineCache.set(weightSd, result);
+  return result;
 }
 
 export function probeBehavior(w: World): { results: ProbeResult[]; n: number } {
   const n = w.pool.n;
   if (n === 0) return { results: [], n: 0 };
-  const e = evaluate(w.pool.genomes, n);
+  const effective = w.pool.genomes.slice(0, n * GENOME_LEN);
+  for (let i = 0; i < effective.length; i++) effective[i] += w.pool.somaticWeights[i];
+  const e = evaluate(effective, n);
   const b = baseline(w.setup.founderWeightSd);
   const results = PROBES.map<ProbeResult>((p, i) => {
     const se = b.sds[i] / Math.sqrt(n) || 1e-9;
@@ -217,6 +221,7 @@ export const ABLATION_GROUPS: { group: AblationGroup; label: string }[] = [
   { group: 'energy', label: 'Czucie własnej energii' },
   { group: 'walls', label: 'Zmysł ścian' },
   { group: 'temperature', label: 'Czucie temperatury' },
+  { group: 'communication', label: 'Odbiór lokalnych sygnałów' },
 ];
 
 interface CohortRun {
@@ -460,4 +465,3 @@ export function clusterStrategies(world: World, k = 4): StrategyCluster[] {
   out.sort((a, b) => b.count - a.count);
   return out;
 }
-

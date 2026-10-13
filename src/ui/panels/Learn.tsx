@@ -4,6 +4,7 @@ import { Help } from '../help/Help';
 import { LESSONS } from '../help/lessons';
 import { uiBus } from '../help/store';
 import { HELP_GROUPS, type HelpGroup, type Lesson } from '../help/types';
+import { GuidedLesson, type GuidedSession } from './GuidedLesson';
 
 export type LearnTab = 'start' | 'lessons' | 'glossary';
 
@@ -13,7 +14,8 @@ interface Props {
   /** wpis słownika do podświetlenia i rozwinięcia */
   focus: string | null;
   lessonFocus: string | null;
-  onRunLesson: (l: Lesson) => void;
+  onRunLesson: (l: Lesson, seed?: number) => void;
+  guided?: GuidedSession | null;
 }
 
 function Chips({ ids, onPick }: { ids: string[]; onPick: (id: string) => void }) {
@@ -189,13 +191,14 @@ function LessonCard({ l, open, toggle, onRun, openGlossary }: { l: Lesson; open:
   );
 }
 
-function LessonsTab({ lessonFocus, onRunLesson, openGlossary }: { lessonFocus: string | null; onRunLesson: (l: Lesson) => void; openGlossary: (id: string) => void }) {
+function LessonsTab({ lessonFocus, onRunLesson, openGlossary, guided }: { lessonFocus: string | null; onRunLesson: (l: Lesson,seed?:number) => void; openGlossary: (id: string) => void; guided?:GuidedSession|null }) {
   const [open, setOpen] = useState<string | null>(lessonFocus ?? LESSONS[0]?.id ?? null);
   useEffect(() => {
     if (lessonFocus) setOpen(lessonFocus);
   }, [lessonFocus]);
   return (
     <div className="panel-body">
+      {guided && <GuidedLesson key={guided.ids.join(':')} session={guided} repeat={()=>onRunLesson(guided.lesson,(guided.seed+1)>>>0)} />}
       <section className="card">
         <p className="prose">
           Każda lekcja to gotowy eksperyment: jedno kliknięcie tworzy światy i ustawia tempo. Przy każdej podaję hipotezę, na co patrzeć oraz — jeśli to zmierzyłem — <b>co faktycznie wyszło</b>, także gdy to nie to, czego
@@ -291,7 +294,7 @@ function GlossaryTab({ focus, openGlossary }: { focus: string | null; openGlossa
   );
 }
 
-export function LearnPanel({ tab, onTab, focus, lessonFocus, onRunLesson }: Props) {
+export function LearnPanel({ tab, onTab, focus, lessonFocus, onRunLesson, guided }: Props) {
   const openGlossary = (id: string) => uiBus.send({ type: 'glossary', id });
   return (
     <>
@@ -309,7 +312,7 @@ export function LearnPanel({ tab, onTab, focus, lessonFocus, onRunLesson }: Prop
         ))}
       </div>
       {tab === 'start' && <StartTab onTab={onTab} openGlossary={openGlossary} />}
-      {tab === 'lessons' && <LessonsTab lessonFocus={lessonFocus} onRunLesson={onRunLesson} openGlossary={openGlossary} />}
+      {tab === 'lessons' && <LessonsTab lessonFocus={lessonFocus} onRunLesson={onRunLesson} openGlossary={openGlossary} guided={guided} />}
       {tab === 'glossary' && <GlossaryTab focus={focus} openGlossary={openGlossary} />}
     </>
   );

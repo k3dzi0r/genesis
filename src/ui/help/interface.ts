@@ -7,7 +7,7 @@ export const INTERFACE: HelpMap = {
     title: 'Plansza świata',
     short: 'Kółko myszy = zoom, przeciąganie = przesuwanie, klik w organizm = zaznaczenie. Kółko wokół zaznaczonego to jego zasięg zmysłów, a linia pokazuje, gdzie patrzy.',
     more: [
-      'Rozmiar kropki to rozmiar ciała, mała jasna plamka to „nos” — kierunek ruchu. Zielone tło to pokarm, ciemniejsze plamy to mapa żyzności.',
+      'Rozmiar kropki to rozmiar ciała, mała jasna plamka to „nos” — kierunek ruchu. Turkusowe tło to pokarm A, bursztynowe B, szare komórki to bariery; nakładka Nisza pokazuje kultywację.',
       'Renderer rysuje wszystkie organizmy jednym wywołaniem karty graficznej (WebGL2), więc gładko działa nawet przy tysiącach.',
     ],
     try: 'Najedź na planszę, przybliż kółkiem i kliknij pojedynczy organizm.',
@@ -16,7 +16,7 @@ export const INTERFACE: HelpMap = {
   'ui.color': {
     group: 'Interfejs',
     title: 'Tryb koloru',
-    short: 'Wybiera, co oznaczają kolory kropek: pokrewieństwo, strategia, energia, pokolenie, wiek, dieta lub klad.',
+    short: 'Wybiera, co oznaczają kolory kropek: pokrewieństwo, strategia, energia, pokolenie, wiek, dieta, klad, sygnał albo specjalizacja A/B.',
     more: ['Zmień tryb, żeby zobaczyć inną warstwę tej samej populacji: „Dieta” pokazuje drapieżniki na czerwono, „Klad” — terytoria linii założycieli, „Energia” — kto głoduje.'],
     see: ['color.lineage', 'color.strategy', 'color.energy', 'color.generation', 'color.age', 'color.diet', 'color.clade'],
   },
@@ -176,7 +176,7 @@ export const INTERFACE: HelpMap = {
   'insp.genome': {
     group: 'Organizm',
     title: 'Pasek genomu',
-    short: 'Każdy prostokąt to jeden gen: najpierw 11 cech, potem 207 wag sieci. Turkus = waga dodatnia, czerwień = ujemna.',
+    short: 'Każdy prostokąt to jeden gen: najpierw 16 cech, potem 273 wag sieci. Turkus = waga dodatnia, czerwień = ujemna.',
     see: ['genome'],
   },
   'insp.archive': {

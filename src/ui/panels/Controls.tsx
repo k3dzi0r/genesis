@@ -9,7 +9,7 @@ function fmtParam(v: number): string {
   const a = Math.abs(v);
   if (a < 0.001) return v.toExponential(1);
   if (a < 1) return v.toFixed(4).replace(/0+$/, '').replace(/\.$/, '');
-  return v.toFixed(a < 100 ? 2 : 0).replace(/\.?0+$/, '');
+  return a < 100 ? v.toFixed(2).replace(/\.?0+$/, '') : v.toFixed(0);
 }
 
 function ParamSlider({ client, k, meta, value }: { client: WorldClient; k: keyof WorldParams; meta: ParamMeta; value: number }) {
@@ -18,6 +18,7 @@ function ParamSlider({ client, k, meta, value }: { client: WorldClient; k: keyof
   useEffect(() => {
     if (local !== null && Math.abs(local - value) < 1e-12) setLocal(null);
   }, [value, local]);
+  useEffect(() => { window.clearTimeout(timer.current); setLocal(null); return () => window.clearTimeout(timer.current); }, [client, client.historyEpoch]);
   const v = local ?? value;
   return (
     <label className="slider-row" title={meta.hint}>
@@ -58,6 +59,7 @@ const EVENTS: { kind: EventKind; label: string; hint: string; timed: boolean }[]
 export function Controls({ client }: { client: WorldClient }) {
   useManager();
   const info = client.info;
+  const preview = client.history?.preview ?? false;
   const [sev, setSev] = useState(0.6);
   const [dur, setDur] = useState(1500);
   const [food, setFood] = useState(20000);
@@ -70,6 +72,10 @@ export function Controls({ client }: { client: WorldClient }) {
 
   return (
     <div className="panel-body">
+      {preview && <p className="note warn">Podgląd historii. Wróć do teraźniejszości lub rozwidl moment, aby zmieniać środowisko.</p>}
+      <fieldset className="controls-fieldset" disabled={preview}>
+      <section className="card"><header><h4>Podstawowe warunki świata</h4></header><p className="note">Mechaniki włączysz w Modułach. Tutaj zmieniasz ich warunki i koszty.</p>{info && (['regrowthRate','mutationRate','lifespanBase','baseTemperature','biomeContrast'] as (keyof WorldParams)[]).map(k=><ParamSlider key={k} client={client} k={k} meta={PARAM_META[k]} value={info.params[k]} />)}</section>
+      <details className="advanced-controls"><summary>Zdarzenia i interwencje</summary>
       <section className="card">
         <header>
           <h4>
@@ -150,6 +156,8 @@ export function Controls({ client }: { client: WorldClient }) {
         </button>
       </section>
 
+      </details>
+      <details className="advanced-controls"><summary>Wszystkie parametry · zaawansowane</summary>
       {[...groups.entries()].map(([g, items]) => (
         <section className="card collapsible" key={g}>
           <header onClick={() => setOpen({ ...open, [g]: !open[g] })}>
@@ -162,6 +170,8 @@ export function Controls({ client }: { client: WorldClient }) {
           {open[g] && info && items.map(([k, m]) => <ParamSlider key={k} client={client} k={k} meta={m} value={info.params[k]} />)}
         </section>
       ))}
+      </details>
+      </fieldset>
     </div>
   );
 }

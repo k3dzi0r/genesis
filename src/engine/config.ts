@@ -48,6 +48,21 @@ export interface WorldSetup {
 }
 
 export interface WorldParams {
+  biomes: number;
+  biomeContrast: number;
+  plantBShare: number;
+  plantBToxicity: number;
+  viewCos: number;
+  obstacles: number;
+  communication: number;
+  signalCoef: number;
+  mateChoice: number;
+  plasticityRate: number;
+  learnCoef: number;
+  nicheRate: number;
+  cultivationCoef: number;
+  nicheDecay: number;
+
   // — zasoby —
   /** względne tempo wzrostu zasobu (1/tick): logistycznie, proporcjonalnie do istniejącej biomasy */
   regrowthRate: number;
@@ -116,6 +131,21 @@ export const DEFAULT_SETUP: WorldSetup = {
 };
 
 export const DEFAULT_PARAMS: WorldParams = {
+  biomes: 0,
+  biomeContrast: 0.6,
+  plantBShare: 0,
+  plantBToxicity: 0.02,
+  viewCos: -1,
+  obstacles: 0,
+  communication: 0,
+  signalCoef: 0.03,
+  mateChoice: 0,
+  plasticityRate: 0,
+  learnCoef: 0.02,
+  nicheRate: 0,
+  cultivationCoef: 0.1,
+  nicheDecay: 0.0001,
+
   regrowthRate: 0.1,
   foodSeed: 0.03,
   foodCapMax: 60,
@@ -162,6 +192,21 @@ export interface ParamMeta {
 }
 
 export const PARAM_META: Record<keyof WorldParams, ParamMeta> = {
+  biomes: { label: 'Lokalne biomy (0/1)', group: 'Klimat', min: 0, max: 1, step: 1, hint: 'Trzy siedliska różniące się temperaturą, żyznością, udziałem B i reakcją na sezony. 0 przywraca warunki globalne.' },
+  biomeContrast: { label: 'Kontrast biomów', group: 'Klimat', min: 0, max: 1, step: 0.05, hint: 'Siła różnic lokalnych; 0 zachowuje mapę siedlisk, lecz wyrównuje warunki.' },
+  plantBShare: { label: 'Udział pokarmu B', group: 'Zasoby', min: 0, max: 0.9, step: 0.05, hint: 'A i B dzielą tę samą całkowitą pojemność; B rośnie w rzadszych siedliskach.' },
+  plantBToxicity: { label: 'Toksyczność pokarmu B', group: 'Zasoby', min: 0, max: 0.2, step: 0.005, hint: 'Uszkodzenie zdrowia po zjedzeniu B; specjalizacja B zmniejsza toksyczność.' },
+  viewCos: { label: 'Ograniczenie pola widzenia', group: 'Życie', min: -1, max: 0.95, step: 0.05, hint: 'Kosinus połowy pola widzenia; -1 oznacza pełne 360°, 0 przednią półkulę.' },
+  obstacles: { label: 'Przeszkody (0/1)', group: 'Życie', min: 0, max: 1, step: 1, hint: 'Deterministyczne bariery z przejściami blokują ruch, wzrok i kontakty.' },
+  communication: { label: 'Komunikacja (0/1)', group: 'Ewolucja', min: 0, max: 1, step: 1, hint: 'Lokalny sygnał z poprzedniego ticku bez przypisanego znaczenia.' },
+  signalCoef: { label: 'Koszt emisji sygnału', group: 'Koszty', min: 0, max: 0.3, step: 0.005, hint: 'Koszt bezwzględnej amplitudy emisji na masę metaboliczną.' },
+  mateChoice: { label: 'Wybór partnera (0/1)', group: 'Ewolucja', min: 0, max: 1, step: 1, hint: 'Obaj rodzice muszą zaakceptować fenotyp partnera według dziedzicznej preferencji.' },
+  plasticityRate: { label: 'Tempo nowego uczenia', group: 'Ewolucja', min: 0, max: 0.2, step: 0.005, hint: '0 zatrzymuje nowe uczenie i jego koszt, zachowując nabyte wagi. Zmiany nie są dziedziczone.' },
+  learnCoef: { label: 'Koszt plastyczności', group: 'Koszty', min: 0, max: 0.2, step: 0.005, hint: 'Stały koszt aktywnej plastyczności zależny od dziedzicznej zdolności.' },
+  nicheRate: { label: 'Wpływ nowej kultywacji', group: 'Zasoby', min: 0, max: 1, step: 0.05, hint: '0 zatrzymuje nowe inwestycje i ich koszt. Wcześniejsza żyzność oraz nasiona pozostają i podlegają zanikowi.' },
+  cultivationCoef: { label: 'Koszt kultywacji', group: 'Koszty', min: 0, max: 1, step: 0.01, hint: 'Koszt działania kultywacji na jednostkę masy metabolicznej.' },
+  nicheDecay: { label: 'Zanik zmienionej żyzności', group: 'Zasoby', min: 0, max: 0.01, step: 0.0001, hint: 'Powolny zanik warstwy konstrukcji niszy; 0 oznacza trwałą zmianę.' },
+
   regrowthRate: { label: 'Tempo wzrostu zasobów', group: 'Zasoby', min: 0, max: 0.15, step: 0.001, hint: 'Względny przyrost/tick (logistyczny, ∝ istniejącej biomasy)' },
   foodSeed: { label: 'Rozsiew (nasiona)', group: 'Zasoby', min: 0, max: 0.3, step: 0.005, hint: 'Ułamek pojemności działający jak zalążek odrostu przy pustej komórce' },
   foodCapMax: { label: 'Pojemność komórki', group: 'Zasoby', min: 5, max: 300, step: 1, hint: 'Maks. zasób w najżyźniejszej komórce' },

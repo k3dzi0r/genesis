@@ -41,12 +41,13 @@ export interface LessonAction {
   /** tempo startowe: etykieta i ticki/s */
   speed?: { label: string; tps: number };
   /** zakładka prawego panelu do otwarcia po uruchomieniu */
-  openTab?: 'stats' | 'org' | 'gen' | 'cmp' | 'log';
+  openTab?: 'stats' | 'org' | 'gen' | 'cmp' | 'log' | 'history' | 'atlas' | 'lab';
   /** zakładka lewego panelu */
   openLeft?: 'env' | 'exp' | 'saves';
 }
 
 export interface Lesson {
+  guided?: import('./guided').GuidedDefinition;
   id: string;
   title: string;
   level: LessonLevel;

@@ -19,6 +19,7 @@ export const TRAIT_COLORS: Record<string, string> = {
   hue: '#888',
   memory: '#80cbc4',
   diet: '#ff5252',
+  plantSpecialization: '#ffb454', matePreference: '#d7a8ff', mateSelectivity: '#b68cff', plasticity: '#ff80ab', nicheInvestment: '#c5e1a5',
 };
 
 export const FUNCTIONAL_TRAITS = TRAIT_NAMES.filter((t) => t !== 'hue');
@@ -119,7 +120,7 @@ function StrategiesCard({ client }: { client: WorldClient }) {
     <section className="card">
       <header>
         <h4>
-          Strategie w populacji
+          Profile genetyczne populacji
           <Help id="strategies" />
         </h4>
         <span className="hint">k-średnie po cechach fizycznych (k=4)</span>

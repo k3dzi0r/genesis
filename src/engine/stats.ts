@@ -48,6 +48,17 @@ export const STAT_COLUMNS: StatColumn[] = [
   ...BASE_COLUMNS,
   ...TRAIT_NAMES.map((t) => ({ key: `m_${t}`, label: `Średnia: ${t}`, agg: 'mean' as Agg })),
   ...TRAIT_NAMES.map((t) => ({ key: `s_${t}`, label: `Odch. std.: ${t}`, agg: 'mean' as Agg })),
+  { key: 'foodB', label: 'Zasoby pokarmu B', agg: 'mean' },
+  { key: 'meanSignal', label: 'Średnia amplituda sygnału', agg: 'mean' },
+  { key: 'mateWithin', label: 'Rozród wewnątrz grup (łącznie)', agg: 'last' },
+  { key: 'mateBetween', label: 'Rozród między grupami (łącznie)', agg: 'last' },
+  { key: 'mateRejected', label: 'Odrzucone kontakty rozrodcze (łącznie)', agg: 'last' },
+  { key: 'nicheMean', label: 'Średnia zmiana żyzności', agg: 'mean' },
+  { key: 'plasticChange', label: 'Średnia zmiana somatyczna wag', agg: 'mean' },
+  ...[0, 1, 2].map(id => ({ key: `biomePop${id}`, label: `Populacja biomu ${id}`, agg: 'mean' as Agg })),
+  { key: 'biomeMigrations', label: 'Przejścia między biomami (łącznie)', agg: 'last' },
+  { key: 'tempMin', label: 'Najniższa lokalna temperatura', agg: 'mean' },
+  { key: 'tempMax', label: 'Najwyższa lokalna temperatura', agg: 'mean' },
 ];
 
 export const STAT_INDEX: Record<string, number> = Object.fromEntries(STAT_COLUMNS.map((c, i) => [c.key, i]));

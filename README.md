@@ -1,134 +1,93 @@
 # GENESIS — laboratorium sztucznego życia i ewolucji
 
-**[▶ Uruchom w przeglądarce](https://k3dzi0r.github.io/genesis/)** · [dokumentacja mechaniki](docs/MECHANICS.md) · [architektura](docs/ARCHITECTURE.md) · licencja MIT
+Wersja lokalna **0.5.0**. [Opublikowana aplikacja](https://k3dzi0r.github.io/genesis/) · [mechanika](docs/MECHANICS.md) · [architektura](docs/ARCHITECTURE.md) · [plan i weryfikacja 0.5](docs/IMPLEMENTATION_0.5.md) · [roadmapa](roadmapa.md). Zmiany tego wydania nie są automatycznie publikowane przez pracę lokalną.
 
-Eksperymentalne laboratorium ALife w przeglądarce. Organizmy z dziedzicznymi genomami i małymi sieciami neuronowymi (z pamięcią rekurencyjną) żyją w świecie 2D z jawnym bilansem energii,
-mogą się odżywiać roślinnością albo atakować inne organizmy i rozmnażać się bezpłciowo lub płciowo.
-Nie ma funkcji fitness ani zaprogramowanych zachowań: sukces to rozmnożenie się, a to, co organizmy faktycznie robią, wynika z ewoluujących wag sieci.
+Organizmy z dziedzicznymi genomami żyją w świecie 2D, jedzą, polują i rozmnażają się. Sieć 23→8→9 ma pamięć rekurencyjną, opcjonalną plastyczność podczas życia oraz wyjścia sygnału i kultywacji. Genom ma 16 cech i 273 wagi. Koszty i transfery energii są księgowane. Nie ma ręcznie narzuconej strategii ostrzegania, współpracy lub tworzenia gatunków: ich powstanie pozostaje wynikiem eksperymentów.
 
-> **Status: wersja 0.3.0 — działający silnik ewolucyjny + interfejs; Fazy 1 i 2 w całości, z Fazy 3: drapieżnictwo, rozwinięty mózg (pamięć), rozmnażanie płciowe.**
-> Komunikacja, zachowania społeczne i ewolucja topologii sieci (NEAT) **nie są** zaimplementowane.
-
-## Szybki start
+## Uruchomienie
 
 ```bash
 npm install
-npm run dev          # http://localhost:5173 (lub kolejny wolny port)
-npm test             # testy silnika i spójności treści edukacyjnych
-npm run build        # build produkcyjny do dist/
+npm run dev
 npm run typecheck
+npm test
+npm run build
 ```
 
-Wymagania: Node ≥ 20, przeglądarka z WebGL2 (Chrome, Edge, Safari ≥ 15, Firefox).
-
-Strona z repozytorium wdraża się sama na GitHub Pages (workflow `.github/workflows/pages.yml`: typecheck → testy → build → publikacja). Cała symulacja działa w przeglądarce użytkownika;
-zapisy trafiają do jego IndexedDB, serwer nie przechowuje żadnych danych.
-
-### Długie eksperymenty bez UI (headless)
+Node ≥20, przeglądarka z WebGL2. Symulacja działa w workerach przeglądarki, zapis lokalnie w IndexedDB. Wiele światów, bliźniaki, rozwidlenia, serie seedów i siatki parametrów pozostają dostępne. Praca lokalna nie wymaga backendu.
 
 ```bash
-npm run headless -- --ticks 1000000 --seed 7 --out runs/exp1 --checkpoint 100000 --report 20000
-npm run headless -- --resume runs/exp1/latest.genesis --ticks 3000000 --out runs/exp1   # wznowienie
-npm run analyze  -- runs/exp1/latest.genesis --ablation                                 # strategie, sondy, test ablacji
+npm run headless -- --ticks 100000 --seed 7 --out runs/exp1 --checkpoint 10000
+npm run analyze -- runs/exp1/latest.genesis --ablation
 ```
 
-Pliki `.genesis` (punkty kontrolne) można zaimportować w przeglądarce: **Zapisy → Importuj plik**. Opcje: `--setup '{"width":1200,"height":1200,"initialPopulation":800}'`,
-`--params '{"predationPower":6,"sexual":1}'`. Zapisy ze starszych wersji silnika (≤ 0.2) są odrzucane z komunikatem — zmienił się układ genomu.
+Pliki `.genesis` importuje się w Zapisy. Format v4 zachowuje cały stan wraz z mapą biomów, licznikami migracji i fazą klimatu. Zapisy v2/v3 są migrowane, v1 jest odrzucany. Okazy Atlasu 0.4 zachowują genom, stan nauczony, pochodzenie i dawne wyniki; nowe próby są oznaczone silnikiem 0.5. Migracja nie obiecuje zgodnej trajektorii między różnymi wersjami silnika.
 
-## Co działa (sprawdzone testami lub ręcznie w przeglądarce)
+## Nowe w 0.5
 
-| Obszar | Stan |
+- **Moduły:** 11 przełączników mechanik i zestawy Podstawy, Zróżnicowany świat oraz Wszystkie mechaniki. Parametry świata określają rzeczywisty stan. Wybór partnera wymaga rozrodu płciowego; wyłączenie B przekształca pozostały pokarm w A bez utraty energii. Wyłączenie uczenia lub kultywacji zachowuje wcześniej nabyte wagi i zmienioną glebę.
+- **Widok:** Obserwuj, Ucz się i Eksperymentuj oraz własny wybór widocznych zakładek. Te preferencje upraszczają interfejs bez zmiany biologii i pozostają na urządzeniu.
+- **Biomy:** trzy siedliska z lokalną temperaturą, żyznością, udziałem B i sezonowością. Mapy biomów/temperatury, panel populacji i zasobów oraz liczniki rzeczywistych przejść przez granice.
+- **Nauka:** sześć prowadzonych prób kontrola/wariant na wspólnym seedzie. Przewodnik porównuje faktyczne pomiary z tego samego ticku i okna agregacji, rozpoznaje dodatkowe interwencje, brak danych oraz wymarcie. Interpretację można zapisać w sesji i powtórzyć próbę z kolejnym seedem.
+- **Dziennik:** kliknięcie dostępnego zdarzenia odtwarza dokładny stan i pokazuje otaczające statystyki, z jawnym przedziałem liczników.
+
+Zacznij od **Moduły → Podstawy** i **Widok → Obserwuj**, a potem stopniowo dodawaj mechaniki. W Nauka → Lekcje wybierz prowadzoną próbę, aby porównać jedną interwencję.
+
+[Kalibracja 0.5](docs/calibration-0.5/REPORT.md) obejmuje 42 biegi, sześć ustalonych seedów i siedem warunków. Cel 10 000 ticków osiągnęło 7/42 biegów; pozostałe wymarły wcześniej. Wszystkie przedziały różnicy populacji końcowej obejmują zero. Wyniki nie potwierdzają ogólnej przewagi badanych mechanik. Pełny setup, parametry i osiągnięty czas są zachowane w danych.
+
+```bash
+npm run calibrate -- --seeds 101,202,303,404,505,606 --ticks 10000 --out docs/calibration-0.5
+```
+
+## Dziewięć kierunków v0.4
+
+| Kierunek | Mechanika i dostęp |
 |---|---|
-| Świat 2D, siatka zasobów z logistycznym wzrostem, mapa żyzności (plamy/gradient/oaza/jednolity) | ✅ |
-| **Dynamiczne plamy żyzności**: dryf i cykl życia (rosną, wygasają, odradzają się gdzie indziej) | ✅ (testy + UI) |
-| Bilans energii z księgą wpływów/strat; niezgodność rzędu 1e‑5 przy przepływie energii rzędu 1e7 po milionie ticków (zaokrąglenia), także z drapieżnictwem, płciowym rozrodem i ruchomymi plamami | ✅ (testy + wskaźnik w UI) |
-| Organizmy: tożsamość, rodzice, pokolenie, wiek i limit życia, energia, zdrowie, fizjologia z kompromisami | ✅ |
-| Genom (11 cech + 207 wag), dziedziczenie, mutacje o regulowanej intensywności, rejestr mutacji | ✅ |
-| Sieć 17‑8‑7 z **pamięcią rekurencyjną** (3 komórki, trwałość kodowana genem) i wejściami o cechach sąsiada | ✅ |
-| **Drapieżnictwo**: atak jako zdolność (gen diety), transfer energii z kosztem, sprawiedliwy podział między napastników; kaskady troficzne | ✅ (testy dokładnego transferu + przebiegi) |
-| **Rozmnażanie płciowe**: wybór partnera w zasięgu, rekombinacja neuron po neuronie, drugi rodzic w genealogii | ✅ (testy + przebiegi) |
-| Reprodukcja z kosztem, śmierć (6 przyczyn), limit populacji z energii + twardy bezpiecznik | ✅ |
-| Siatka przestrzenna zamiast O(n²) (test zgodności z wersją naiwną) | ✅ |
-| Deterministyczny RNG; ten sam seed + konfiguracja → identyczny stan, niezależnie od FPS i tempa | ✅ (testy) |
-| Zapis/odczyt pełnego stanu, wersjonowany format, autozapis (IndexedDB), eksport/import plików; wznowiony świat identyczny bit w bit | ✅ (testy + UI) |
-| Genealogia: trwałe id, drzewo przodków/potomków, odtwarzanie genomu przodka, porównanie przodek↔potomek, trajektorie cech wzdłuż linii, **scalanie łańcuchów** (ograniczony wzrost w długich przebiegach) | ✅ (testy + UI) |
-| **Klady** (linie założycieli): udział największego kladu, liczba kladów, wykrywanie „wymiatania” | ✅ |
-| Statystyki i wykresy (populacja, cechy, energia, różnorodność, pokolenia, zgony wg przyczyn, drapieżnictwo, klady, przepływ energii), ograniczona pamięć | ✅ |
-| Zdarzenia: susza, obfitość, ochłodzenie, katastrofa, zaraza, pory roku, dosypywanie zasobów; dziennik poleceń i historia parametrów | ✅ |
-| Wykrywanie wymarcia, gwałtownych spadków/wzrostów populacji i wymiatania kladów | ✅ |
-| Wiele światów równolegle, **bliźniak**, **rozwidlenie**, porównanie metryk, seria seedów z 95 % CI, eksport CSV/JSON | ✅ |
-| **Przeszukiwanie parametrów** (siatka 1D/2D × seedy, mapa cieplna) i **test A/B** (przedziały ufności, test Welcha) | ✅ (testy + UI) |
-| **Test ablacji kohortowej**: czy zmysł (pokarm, sąsiedzi, pamięć, energia…) opłaca się indywidualnie | ✅ (testy + UI + CLI) |
-| **Klastrowanie strategii** (k-średnie, nazwy z odchyleń cech) i sondy zachowań vs losowe sieci | ✅ |
-| **Warstwa edukacyjna**: ~190 haseł słownika, ponad 60 symboli „?” w interfejsie (hover = skrót, klik = pełny opis z ciekawostką i powiązaniami), 11 lekcji z gotowymi eksperymentami i zmierzonymi wynikami, ekran powitalny | ✅ (testy spójności treści + UI) |
-| Renderer WebGL2 (zoom, przesuwanie, zaznaczanie, nakładki: zasoby, sensory, energia, ślad, gęstość, podążanie; 7 trybów koloru, m.in. dieta i klad) | ✅ |
-| Tryb headless z punktami kontrolnymi i wznawianiem (`npm run headless`) | ✅ |
+| Historia świata | Punkty kontrolne, dokładny tick, wydarzenia, odtwarzanie, zachowana teraźniejszość, rozwidlenie i eksport/import archiwum. Panel Historia. |
+| Komunikacja | Kosztowny podpisany sygnał lokalny bez wbudowanego znaczenia; odbiór poprzedniego ticku, kierunek, blokowanie przez bariery. Nakładka/kolor Sygnał, ablacja odbioru. |
+| Izolacja rozrodcza | Dziedziczne preferencje i selektywność, obustronna akceptacja. Atlas pokazuje próbkę zgodności, odrzucenia i obserwowane krzyżowania profili A/B. |
+| Dwa pokarmy | Wspólny budżet pojemności A/B, rzadsze siedliska B, kompromis trawienia i toksyczność. Kolor Pokarm A/B, turkus/bursztyn na mapie. |
+| Aktywna percepcja | Regulowane pole widzenia, przeszkody z przejściami i ograniczona linia widzenia. Obrót zmienia dostępne bodźce; sensory nadal agregują widoczne komórki. |
+| Uczenie podczas życia | Somatyczne delty wag i ślady aktywności modulowane nagrodą energetyczną; koszt plastyczności. Potomstwo dostaje genom. Inspektor przełącza sieć genotypową/efektywną. |
+| Atlas zachowań | Grupy z faktycznego ruchu, żerowania, polowania, powrotów i reakcji na zagrożenie. Kompletne zachowane okazy z ograniczonym nagraniem i wynikami prób. |
+| Konstruowanie niszy | Kosztowna kultywacja zwiększa pojemność gleby i rozsiewa przeniesione nasiona. Trwały, zanikający stan środowiska; fioletowa nakładka Nisza. |
+| Laboratorium organizmów | Genotyp A/B × dwa środowiska, pełne zapisane środowiska lub jawnie nowe mapy z parametrów. Pojedyncza mutacja, odroczona wskazówka i kontrola pamięci, progres/anulowanie i wyniki dołączone do okazu. |
 
-**Nie zweryfikowane:** Safari/Firefox, sterowanie dotykiem na tabletach (układ jest responsywny, ale nie testowany na urządzeniu), odzyskiwanie po utracie kontekstu WebGL, światy > ~10 tys. organizmów,
-zgodność bitowa między różnymi silnikami JS (silnik używa wyłącznie arytmetyki IEEE‑754, ale testowano Node/V8 i Chrome).
+Nowe scenariusze: **Żywy ekosystem**, **Dwa pokarmy**, **Ograniczony wzrok**, **Lokalne sygnały**, **Dobór partnera**, **Uczenie podczas życia**, **Konstrukcja niszy**. Parametry są dostępne także na żywo. Domyślne nowe przełączniki mechanik są wyłączone, żeby można było badać ich wpływ osobno. Nauka zawiera praktyczne lekcje, pomoc wszystkich genów/parametrów i opisy wszystkich kanałów sieci.
 
-**Plan (niezaimplementowane):** komunikacja, zachowania społeczne, preferencje partnera i specjacja, NEAT, mózg decydujący o rozrodzie, biomy/teren, moduł Rust/WASM, WebGPU, backend sieciowy,
-suwak odtwarzania historii. Punkty zaczepienia opisuje [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+## Jak zacząć badanie
 
-## Interfejs
+1. W Eksperymencie wybierz scenariusz i uruchom kilka tysięcy ticków.
+2. Kliknij osobnika. Sprawdź rzeczywiste liczniki i efektywną sieć; zachowaj okaz.
+3. W Historii cofnij się do wcześniejszego ticku i rozwidl moment. Zmień jeden parametr w nowym świecie.
+4. W Atlasie porównaj zmiany aktywności i zgodności partnerów. Okazy przetrwają przycinanie genealogii i odświeżenie strony.
+5. W Laboratorium pobierz żywego osobnika oraz genom zachowanego przodka. Wybierz prawdziwe dawne środowisko z dostępnej historii i porównaj cztery komórki na tych samych seedach.
 
-* **Środek** — żywy świat. Kółko myszy = zoom, przeciąganie = przesuwanie, klik = zaznaczenie organizmu. Chipy: Zasoby, Sensory, Energia, Ślad, Gęstość, Podążaj; lista „Kolor” (linia, strategia, energia, pokolenie, wiek, dieta, klad).
-* **Pasek sterowania** — Start/Pauza (Spacja), Krok (`.`), +100, tempo 1×/10×/100×/1000×/MAX (klawisze 1–5; 1× = 30 ticków/s), Esc = odznacz.
-* **Lewy panel** — *Środowisko*: zdarzenia, dosypywanie zasobów, wszystkie parametry na żywo (w tym drapieżnictwo, rozmnażanie, dryf plam) · *Eksperyment*: seed, nowy świat ze scenariuszem (12 presetów),
-  bliźniak/rozwidlenie/reset, seria seedów, **test A/B**, **przeszukiwanie parametrów**, eksporty · *Zapisy*.
-* **Prawy panel** — *Statystyki* (KPI, strategie, sondy zachowań, test ablacji, wykresy) · *Organizm* (fizjologia, pamięć, schemat sieci z aktywacjami, genom) · *Genealogia* (drzewo, cechy wzdłuż linii, porównanie z przodkiem) · *Porównanie* światów · *Dziennik*.
+Podgląd historii blokuje żywe kroki i interwencje; wróć do teraźniejszości lub rozwidl moment. Archiwum `.genesis-history` jest oddzielne od pojedynczego zapisu `.genesis`. Historia domyślnie zachowuje punkty co 1000 ticków, najwyżej 24 i 64 MiB; najstarsze chwile mogą wypaść z retencji.
 
-## Aspekt edukacyjny
+## Interpretacja i ograniczenia
 
-Aplikacja ma uczyć, nie tylko pokazywać. Zakładka **Nauka** (przycisk w górnym pasku lub klawisz `?`) zawiera:
+Atlas używa opisowych reguł pomiarowych; etykieta „powracający” nie dowodzi planowania. Próbka zgodności obejmuje najwyżej 64 organizmy i nie nadaje trwałych tożsamości gatunków. Krzyżowania A/B dotyczą dwóch profili pokarmowych, nie automatycznie gatunków. Trwała specjacja, współpraca i ostrzeganie wymagają odrębnych, długich eksperymentów.
 
-* **Start** — czym jest GENESIS, jak czytać planszę, losowa ciekawostka;
-* **Lekcje** — 11 gotowych eksperymentów (dobór naturalny, kaskada troficzna, efekt założyciela, mutacje, płeć, pory roku, wąskie gardło, test ablacji, test A/B…). Jedno kliknięcie tworzy światy i otwiera
-  odpowiednią zakładkę. Przy każdej lekcji podane są hipoteza, na co patrzeć i **co faktycznie zmierzono** w testach autora — także gdy hipoteza się nie sprawdziła (lekcja o wędrujących plamach);
-* **Słownik** — ok. 190 haseł z wyszukiwarką i działami (Symulacja, Świat, Organizm, Mózg, Ewolucja, Ekologia, Analiza i statystyka, Interfejs). Każde hasło ma skrót, rozwinięcie, „Spróbuj”, ciekawostkę i powiązania.
+Okaz zawiera genom, nauczone wagi, ślady, pamięć, ostatnie 32 próbki trajektorii i wyniki; nie zawiera całej mapy świata. Archiwalny genom przodka nie pozwala odtworzyć jego nieznanego stanu nauczonego. W próbach genetycznych stan somatyczny jest resetowany; odtwarzanie somatyczne jest dostępne tylko dla zachowanych żywych okazów.
 
-Symbol **?** jest przy suwakach, wykresach, wskaźnikach, polach karty organizmu, przyciskach i nakładkach: najechanie pokazuje skrót, kliknięcie przypina dymek z pełnym opisem (Esc zamyka, „Otwórz w słowniku” przenosi do hasła).
-Ekran powitalny pokazuje się przy pierwszej wizycie (można go wyłączyć i przywołać przyciskiem „Nauka”).
+A/B używa różnic w parach zgodnych seedów i przedziałów t. Welch pozostaje funkcją dla prób niezależnych. Brak automatycznej korekty wielokrotnych porównań. Test pamięci wykrywa reakcję zależną od historii, nie planowanie. Plastyczność może pomagać lub szkodzić.
 
-Zasady treści: każde twierdzenie o GENESIS odpowiada temu, co robi silnik; ciekawostki to sprawdzalne fakty z nazwiskiem lub rokiem; liczby w lekcjach pochodzą z pomiarów (skrypty headless, wersja 0.3.0);
-`tests/help.test.ts` pilnuje, że każdy parametr i gen ma wyjaśnienie, powiązania nie są martwe, klucze się nie dublują, a lekcje używają istniejących parametrów.
-Treści leżą w `src/ui/help/` (pojęcia, parametry, analiza, interfejs, lekcje) — dodanie hasła to jeden wpis w odpowiednim pliku.
+Testy obejmują determinizm, bilans energii, dziedziczenie, nowe mechaniki, autentyczne migracje v2/v3, wznowienie v4, lokalny klimat, przełączniki, prowadzone lekcje, historię z działaniami tego samego ticku, niezmienność źródła analiz, kontrolowane ogrody, pojedynczą interwencję, pamięć i spójność treści. Długie wyniki ewolucyjne w dawnych lekcjach i opisach są jawnie oznaczone jako pomiary **v0.3**; nie są obietnicą zachowania nowego silnika. Tamte pomiary obejmowały utrzymanie drapieżnictwa, czasem jego zanik, korzyści percepcji i zależną od seeda korzyść pamięci. Nie dowodzą nieodwracalności wymarcia drapieżników: dieta nadal mutuje.
 
-## Reprodukowalność
+Safari/Firefox, urządzenia dotykowe, zgodność bitowa między różnymi silnikami JS i bardzo duże populacje pozostają osobnymi zakresami weryfikacji. Rozwinięte relacje społeczne, trwałe tożsamości gatunków, NEAT, zmienna topologia, WASM/WebGPU i backend sieciowy pozostają kolejnymi kierunkami rozwoju.
 
-Wynik zależy od: ustawień świata, seeda, wersji silnika (`ENGINE_VERSION`) oraz dziennika poleceń. Zmiany parametrów i zdarzenia ręczne są logowane z tickiem;
-„Bliźniak od startu” uruchamia świat o identycznych warunkach początkowych — dopóki nie zastosujesz interwencji tylko w jednym z nich, ich trajektorie są identyczne (sprawdzone w UI i w testach).
-Seria seedów, przeszukiwanie parametrów i test A/B uruchamiają tę samą konfigurację dla wielu seedów i liczą średnie z przedziałami ufności.
+## Struktura
 
-## Uczciwość wyników — czytaj przed wyciąganiem wniosków
-
-Szczegóły i ograniczenia: [docs/MECHANICS.md](docs/MECHANICS.md). Najważniejsze obserwacje z testowych przebiegów (domyślny świat, 800×800, 400 założycieli, seedy 1–3 i 5):
-
-* **Drapieżnictwo samo się utrzymuje i zmienia wszystko.** Z domyślnym atakiem drapieżnicy (dieta > 0,3) współistnieją z roślinożercami w 3 seedach przez 80 tys. ticków (9–25 % populacji, ok. 800–2400 zgonów
-  z ich rąk na 1000 ticków). Zasoby stoją wtedy na 15–80 % pojemności (ofiary są przetrzebione — kaskada troficzna), różnorodność cech jest 3–5× wyższa niż bez drapieżników, a rozmiar ciała nie spada do minimum.
-  W jednym teście ze słabszym atakiem (`predationPower = 2`) drapieżnicy wymarli, a zdolność ataku zniknęła z genomów.
-* **Drapieżnicy nie są trwali.** W przebiegu 1 mln ticków (seed 5, ~1600 pokoleń) wymarli między 700 a 900 tys. ticków; potem populacja zbiegła do małych (rozmiar 0,05), prawie ślepych (zasięg 0,06) roślinożerców,
-  różnorodność spadła o połowę, a pozostał jeden klad. Bez drapieżników nic nie przywraca zdolności ataku — to stan pochłaniający.
-* **Które zmysły się opłacają** (test ablacji kohortowej: połowa organizmów traci zmysł w tym samym świecie; zbadano 5 populacji — seedy 1–3 po 80 tys. ticków oraz seed 5 po 500 tys. i po 1 mln):
-  **zmysł pokarmu** zwiększał przeżycie w 4 z 5 populacji (+22 do +55 pp, z = 6–21) i liczbę potomstwa w 5 z 5 (z = 4–20); **zmysł sąsiadów** — słabo i niespójnie (z ≈ 0–6);
-  **pamięć rekurencyjna** opłaciła się w 2 z 3 seedów po 80 tys. ticków (przeżycie +21 i +10 pp, z = 5,7 i 3,4; potomstwo +0,45 i +0,16), była na granicy istotności w seedzie 5 po 500 tys. ticków
-  (potomstwo, z = 2,8) i **nie dawała przewagi po wymarciu drapieżników**. Czucie temperatury (stałe wejście) wychodzi dokładnie 0 — kontrola metody.
-  Test mówi, że zmysł jest używany i się opłaca, **nie mówi, co sieć z pamięcią robi**; to pojedyncze pomiary na kilku seedach, bez korekty na wielokrotne testowanie.
-* **Sondy zachowań** (vs losowe sieci): u wszystkich zbadanych populacji wyewoluował odruch skrętu w stronę pokarmu (z ≈ 10–95) i unikania sąsiadów (z ≈ 21–72). To **proste odruchy** z bardzo małej sieci.
-  **Nie ma tu dowodu na planowanie ani „inteligencję”**, i żaden eksperyment tego nie deklaruje.
-* Bez drapieżników (preset „Bez drapieżników”) ewolucja zwykle kończy się małymi, tanimi, prawie ślepymi organizmami — żyzne środowisko bez presji nie nagradza złożoności.
-* Reprodukcja jest uruchamiana progiem energetycznym (mózg o niej nie decyduje); genom dziedziczy się klonalnie (efekt hitchhikingu) — pojedynczy seed bywa zdominowany przez dryf, dlatego warto używać serii.
-  Tryb płciowy w testach (5 seedów) dawał więcej żyjących kladów (5,0 vs 2,6), ale nie wyższą różnorodność cech (0,12 vs 0,15).
-* Przycinanie i scalanie genealogii usuwają wymarłe linie starsze niż 20 000 ticków oraz pośrednie węzły łańcuchów; przodkowie żywych organizmów zostają zawsze.
-* Soak test 1 mln ticków (seed 5): pamięć procesu stabilna (61–99 MB RSS), genealogia ~20–33 tys. węzłów (bez scalania rosłaby liniowo), tempo 1,5–2,5 tys. ticków/s, niezgodność bilansu energii ~1e‑5 przy przepływie ~1e7.
-
-## Struktura repozytorium
-
-```
-src/engine/   silnik (czysty TS)       src/worker/  worker symulacji, serii i protokół
-src/render/   renderer WebGL2          src/ui/      aplikacja React (panele, wykresy uPlot)
-src/storage/  IndexedDB                scripts/     headless, analyze
-tests/        Vitest (84 testy)       docs/        MECHANICS.md, ARCHITECTURE.md
+```text
+src/engine/   czysty TypeScript: świat, genomy, pamięć/uczenie, historia, analizy, lab
+src/worker/   symulacja, serie, typowane komunikaty, progres i anulowanie
+src/render/   WebGL2: organizmy, pokarmy, teren i nisza
+src/ui/       React: sterowanie, historia, atlas, laboratorium, inspektor, nauka
+src/storage/  IndexedDB zapisów i kompletnych okazów
+scripts/      uruchomienia headless i analizy
+tests/        Vitest
+docs/         mechanika, architektura, plan i dowody weryfikacji
 ```
 
-Stos: TypeScript (strict), React 18, Vite, uPlot, Vitest. Brak zależności od PixiJS — patrz uzasadnienie w docs/ARCHITECTURE.md.
+TypeScript strict, React 18, Vite, uPlot, Vitest. Licencja MIT.

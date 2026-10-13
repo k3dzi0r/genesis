@@ -1,12 +1,15 @@
 /** Protokół komunikacji UI ⇄ Worker symulacji. Czysto typy — brak logiki biologicznej. */
-import type { Command, LogEntry, OrganismView, ActiveEvent } from '../engine/world';
+import type { BiomeSnapshot, Command, LogEntry, OrganismView, ActiveEvent } from '../engine/world';
+import type { HistoryInfo } from '../engine/history';
+import type { BehaviorAtlas, SpeciesAnalysis, Specimen } from '../engine/behavior';
+import type { LabRequest, LabResult } from '../engine/lab';
 import type { WorldParams, WorldSetup } from '../engine/config';
 import type { LineageInfo } from '../engine/lineage';
 import type { RunSummary } from '../engine/experiment';
 import type { AblationRow, AblationSuite, ProbeResult, StrategyCluster } from '../engine/analysis';
 import type { SweepResult } from '../engine/experiment';
 
-export type ColorMode = 'lineage' | 'strategy' | 'energy' | 'generation' | 'age' | 'diet' | 'clade';
+export type ColorMode = 'lineage' | 'strategy' | 'energy' | 'generation' | 'age' | 'diet' | 'clade' | 'signal' | 'specialization';
 
 export interface ViewFlags {
   colorMode: ColorMode;
@@ -17,10 +20,16 @@ export interface ViewFlags {
 export type ToWorker =
   | { t: 'init'; setup: Partial<WorldSetup>; params: Partial<WorldParams> }
   | { t: 'load'; bytes: Uint8Array }
+  | { t: 'loadHistory'; bytes: Uint8Array; req: number }
+  | { t: 'historySeek'; tick: number; req: number }
+  | { t: 'historyLive'; req: number }
+  | { t: 'historyExport'; req: number }
+  | { t: 'historicalWorld'; tick: number; req: number }
   | { t: 'play'; playing: boolean }
   | { t: 'step'; n: number }
   | { t: 'speed'; tps: number }
   | { t: 'command'; cmd: Command }
+  | { t: 'commands'; commands: readonly Command[]; req: number }
   | { t: 'select'; id: number | null }
   | { t: 'view'; flags: ViewFlags }
   | { t: 'ack' }
@@ -33,6 +42,10 @@ export type ToWorker =
   | { t: 'probe'; req: number }
   | { t: 'ablation'; req: number; ticks: number }
   | { t: 'strategies'; req: number; k: number }
+  | { t: 'atlas'; req: number }
+  | { t: 'captureSpecimen'; id: number; archived?: boolean; req: number }
+  | { t: 'lab'; request: LabRequest; req: number }
+  | { t: 'cancelLab'; req?: number }
   | { t: 'sendStats' };
 
 export interface FrameSelection {
@@ -53,6 +66,12 @@ export interface FrameMsg {
   data: Float32Array;
   ids: Float64Array;
   food: Uint8Array;
+  foodB?: Uint8Array;
+  obstacles?: Uint8Array;
+  niche?: Uint8Array;
+  signals?: Float32Array;
+  biome?: Uint8Array;
+  localTemperature?: Float32Array;
   /** mapa żyzności — tylko gdy zmieniła się od ostatniej klatki (dryf plam) */
   fert?: Uint8Array;
   selected: FrameSelection | null;
@@ -68,6 +87,7 @@ export interface StatusMsg {
   measuredTps: number;
   temperature: number;
   growthMult: number;
+  biomes: BiomeSnapshot;
   activeEvents: ActiveEvent[];
   eventLog: LogEntry[];
   eventLogTotal: number;
@@ -80,6 +100,7 @@ export interface StatusMsg {
   lineageRecorded: number;
   lineagePruned: number;
   lineageBytes: number;
+  history: HistoryInfo;
 }
 
 export interface StatsMsg {
@@ -198,9 +219,30 @@ export interface ExportMsg {
 export interface ErrorMsg {
   t: 'error';
   message: string;
+  req?: number;
+  code?: 'cancelled';
 }
 
-export type FromWorker = FrameMsg | StatusMsg | StatsMsg | InitMsg | InspectResult | LineageResult | CompareResult | SavedMsg | ExportMsg | ProbeMsg | AblationRowMsg | AblationDoneMsg | StrategiesMsg | ErrorMsg;
+export interface AtlasMsg { t: 'atlas'; req: number; atlas: BehaviorAtlas; species: SpeciesAnalysis }
+export interface SpecimenMsg { t: 'specimen'; req: number; specimen: Specimen }
+export interface LabProgressMsg { t: 'labProgress'; req: number; done: number; total: number }
+export interface LabMsg { t: 'lab'; req: number; result: LabResult }
+
+export interface HistoryMsg {
+  t: 'history';
+  req: number;
+  info: HistoryInfo;
+}
+export interface HistoryBytesMsg {
+  t: 'historyBytes';
+  req: number;
+  kind: 'archive' | 'world';
+  bytes: Uint8Array;
+}
+
+export interface CommandsMsg { t: 'commands'; req: number; tick: number; applied: number }
+
+export type FromWorker = CommandsMsg | FrameMsg | StatusMsg | StatsMsg | InitMsg | InspectResult | LineageResult | CompareResult | SavedMsg | ExportMsg | ProbeMsg | AblationRowMsg | AblationDoneMsg | StrategiesMsg | HistoryMsg | HistoryBytesMsg | AtlasMsg | SpecimenMsg | LabProgressMsg | LabMsg | ErrorMsg;
 
 // — seria (osobny worker) —
 export type ToSeries =

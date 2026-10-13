@@ -18,6 +18,8 @@ export interface ViewState {
 
 export interface RenderOptions {
   showFood: boolean;
+  showNiche: boolean;
+  environmentMap?: 'none' | 'biome' | 'temperature';
   sensors: boolean;
   energy: boolean;
 }
@@ -37,6 +39,13 @@ uniform vec3 u_view;
 uniform vec2 u_world;
 uniform sampler2D u_fert;
 uniform sampler2D u_food;
+uniform sampler2D u_foodB;
+uniform sampler2D u_obstacles;
+uniform sampler2D u_niche;
+uniform sampler2D u_biome;
+uniform sampler2D u_temperature;
+uniform float u_environmentMap;
+uniform float u_showNiche;
 uniform float u_showFood;
 in vec2 v_ndc;
 out vec4 o;
@@ -51,8 +60,18 @@ void main(){
   float fert = texture(u_fert, uv).r;
   float food = texture(u_food, uv).r;
   vec3 col = bg + vec3(0.012, 0.050, 0.060) * fert;
+  if (u_environmentMap > 0.5 && u_environmentMap < 1.5) {
+    float biome = floor(texture(u_biome, uv).r * 2.0 + 0.5);
+    col = biome < 0.5 ? vec3(0.055,0.19,0.13) : biome < 1.5 ? vec3(0.07,0.12,0.27) : vec3(0.27,0.13,0.045);
+  } else if (u_environmentMap > 1.5) {
+    col = mix(vec3(0.04,0.10,0.30),vec3(0.33,0.09,0.025),texture(u_temperature,uv).r);
+  }
   float f = clamp(food, 0.0, 1.0);
   col += u_showFood * (vec3(0.02, 0.20, 0.17) * f + vec3(0.10, 0.45, 0.28) * f * f);
+  float foodB = texture(u_foodB, uv).r;
+  col += u_showFood * vec3(0.50, 0.24, 0.06) * foodB;
+  col += u_showNiche * vec3(0.24, 0.08, 0.42) * texture(u_niche, uv).r;
+  col = mix(col, vec3(0.20, 0.24, 0.30), texture(u_obstacles, uv).r);
   // cienka ramka świata
   vec2 d = min(uv, 1.0 - uv) * u_world * u_view.z;
   float edge = 1.0 - smoothstep(0.0, 1.5, min(d.x, d.y));
@@ -158,6 +177,13 @@ export class GlRenderer {
   private instBuf!: WebGLBuffer;
   private texFert!: WebGLTexture;
   private texFood!: WebGLTexture;
+  private texFoodB!: WebGLTexture;
+  private texObstacles!: WebGLTexture;
+  private texNiche!: WebGLTexture;
+  private texBiome!: WebGLTexture;
+  private texTemperature!: WebGLTexture;
+  private environment: { biome: Uint8Array; temperature: Uint8Array } | null = null;
+  private layers: { foodB: Uint8Array; obstacles: Uint8Array; niche: Uint8Array } | null = null;
   private worldW = 800;
   private worldH = 800;
   private nx = 1;
@@ -181,6 +207,8 @@ export class GlRenderer {
       this.initGl();
       if (this.fert) this.uploadTex(this.texFert, this.fert);
       if (this.food) this.uploadTex(this.texFood, this.food);
+      if (this.layers) this.setLayers(this.layers.foodB, this.layers.obstacles, this.layers.niche);
+      if (this.environment) { this.uploadTex(this.texBiome,this.environment.biome); this.uploadTex(this.texTemperature,this.environment.temperature); }
     });
     this.initGl();
   }
@@ -213,6 +241,13 @@ export class GlRenderer {
     gl.bindVertexArray(null);
     this.texFert = this.makeTex();
     this.texFood = this.makeTex();
+    this.texFoodB = this.makeTex(); this.texObstacles = this.makeTex(); this.texNiche = this.makeTex();
+    this.texBiome = this.makeTex(); this.texTemperature = this.makeTex();
+    gl.bindTexture(gl.TEXTURE_2D,this.texBiome);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);
+    gl.bindTexture(gl.TEXTURE_2D, this.texObstacles);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     if (this.inst) {
       gl.bindBuffer(gl.ARRAY_BUFFER, this.instBuf);
       gl.bufferData(gl.ARRAY_BUFFER, this.inst, gl.DYNAMIC_DRAW);
@@ -245,6 +280,8 @@ export class GlRenderer {
     this.fert = fert;
     this.food = new Uint8Array(nx * ny);
     this.count = 0;
+    this.setLayers(new Uint8Array(nx * ny), new Uint8Array(nx * ny), new Uint8Array(nx * ny));
+    this.setEnvironment(new Uint8Array(nx*ny),new Float32Array(nx*ny));
     if (!this.lost) {
       this.uploadTex(this.texFert, fert);
       this.uploadTex(this.texFood, this.food);
@@ -260,6 +297,18 @@ export class GlRenderer {
   setFood(food: Uint8Array): void {
     this.food = food;
     if (!this.lost) this.uploadTex(this.texFood, food);
+  }
+
+  setLayers(foodB: Uint8Array, obstacles: Uint8Array, niche: Uint8Array): void {
+    this.layers = { foodB, obstacles, niche };
+    if (!this.lost) {
+      this.uploadTex(this.texFoodB, foodB); this.uploadTex(this.texObstacles, obstacles); this.uploadTex(this.texNiche, niche);
+    }
+  }
+
+  setEnvironment(biome: Uint8Array, temperature: Float32Array): void {
+    this.environment = { biome: Uint8Array.from(biome, id=>Math.round(id*127.5)), temperature: Uint8Array.from(temperature,t=>Math.round(Math.max(0,Math.min(1,t/1.2))*255)) };
+    if (!this.lost) { this.uploadTex(this.texBiome,this.environment.biome); this.uploadTex(this.texTemperature,this.environment.temperature); }
   }
 
   setOrganisms(data: Float32Array, n: number): void {
@@ -293,6 +342,11 @@ export class GlRenderer {
     gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, this.texFood);
     gl.uniform1i(gl.getUniformLocation(this.bg, 'u_food'), 1);
+    const layers = [this.texFoodB, this.texObstacles, this.texNiche, this.texBiome, this.texTemperature];
+    const names = ['u_foodB', 'u_obstacles', 'u_niche', 'u_biome', 'u_temperature'];
+    layers.forEach((texture, i) => { gl.activeTexture(gl.TEXTURE2 + i); gl.bindTexture(gl.TEXTURE_2D, texture); gl.uniform1i(gl.getUniformLocation(this.bg, names[i]), i + 2); });
+    gl.uniform1f(gl.getUniformLocation(this.bg, 'u_showNiche'), opt.showNiche ? 1 : 0);
+    gl.uniform1f(gl.getUniformLocation(this.bg,'u_environmentMap'),opt.environmentMap==='biome'?1:opt.environmentMap==='temperature'?2:0);
     gl.bindVertexArray(this.vao);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
 
@@ -321,7 +375,8 @@ export class GlRenderer {
     gl.deleteBuffer(this.quadBuf);
     gl.deleteBuffer(this.instBuf);
     gl.deleteTexture(this.texFert);
-    gl.deleteTexture(this.texFood);
+    gl.deleteTexture(this.texFood); gl.deleteTexture(this.texFoodB); gl.deleteTexture(this.texObstacles); gl.deleteTexture(this.texNiche);
+    gl.deleteTexture(this.texBiome); gl.deleteTexture(this.texTemperature);
     gl.deleteVertexArray(this.vao);
   }
 }

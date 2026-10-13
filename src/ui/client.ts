@@ -3,12 +3,14 @@
  * Nie zawiera żadnej logiki biologicznej — tylko komunikację i bufory.
  */
 import type { Command } from '../engine/world';
+import { gunzipHistory, type HistoryInfo } from '../engine/history';
+import type { LabRequest } from '../engine/lab';
 import type { WorldParams, WorldSetup } from '../engine/config';
 import { N_STATS, STAT_COLUMNS, STAT_INDEX } from '../engine/stats';
 import { gunzip, readHeader } from '../engine/serialize';
 import { putSave, pruneAuto, downloadBytes } from '../storage/db';
 import type {
-  AblationDoneMsg, AblationRowMsg, CompareResult, FrameMsg, FromWorker, InspectResult, LineageResult, ProbeMsg, StatusMsg, StrategiesMsg, ToWorker, ViewFlags,
+  AblationDoneMsg, AblationRowMsg, AtlasMsg, CommandsMsg, CompareResult, FrameMsg, FromWorker, HistoryBytesMsg, HistoryMsg, InspectResult, LabMsg, LineageResult, ProbeMsg, SpecimenMsg, StatusMsg, StrategiesMsg, ToWorker, ViewFlags,
 } from '../worker/protocol';
 
 export class StatsClient {
@@ -68,7 +70,7 @@ export class StatsClient {
   }
 }
 
-type Pending = (m: never) => void;
+type Pending = { resolve: (m: unknown) => void; reject: (error: Error) => void };
 
 let seq = 1;
 
@@ -83,11 +85,16 @@ export class WorldClient {
   ready = false;
   error: string | null = null;
   selectedId: number | null = null;
+  history: HistoryInfo | null = null;
+  /** Increments when time is navigated; renderer clears trajectories without resetting camera. */
+  historyEpoch = 0;
   view: ViewFlags = { colorMode: 'lineage', sensors: false, energy: false };
   speedLabel = '1×';
   /** czy świat został przeładowany/zresetowany — widok resetuje kamerę */
   worldEpoch = 0;
   private pending = new Map<number, Pending>();
+  private labProgressHandlers = new Map<number, (done: number, total: number) => void>();
+  private labRequest: number | null = null;
   private rowHandlers = new Map<number, (m: AblationRowMsg) => void>();
   private listeners = new Set<() => void>();
   private frameListeners = new Set<(f: FrameMsg) => void>();
@@ -105,6 +112,7 @@ export class WorldClient {
     this.worker.onmessage = (e: MessageEvent<FromWorker>) => this.onMessage(e.data);
     this.worker.onerror = (e) => {
       this.error = e.message;
+      this.rejectPending(new Error(e.message));
       this.emit();
     };
   }
@@ -139,6 +147,7 @@ export class WorldClient {
         break;
       case 'status':
         this.info = m;
+        this.history = m.history;
         this.setup = m.setup;
         this.emit();
         break;
@@ -148,23 +157,47 @@ export class WorldClient {
         break;
       case 'saved':
         this.onSaved(this, m);
+        this.resolvePending(m.req, m);
+        break;
+      case 'history':
+        this.history = m.info;
+        this.selectedId = m.info.selectedId;
+        this.historyEpoch++;
+        this.error = null;
+        this.resolvePending(m.req, m);
+        this.emit();
         break;
       case 'ablationRow':
         this.rowHandlers.get(m.req)?.(m);
         break;
+      case 'labProgress':
+        this.labProgressHandlers.get(m.req)?.(m.done, m.total);
+        break;
       case 'error':
-        this.error = m.message;
-        console.error('[worker]', m.message);
+        // Request errors are handled by their caller; the live world remains usable.
+        if (m.req === undefined && m.code !== 'cancelled') { this.error = m.message; console.error('[worker]', m.message); }
+        if (m.req !== undefined) {
+          this.pending.get(m.req)?.reject(new Error(m.message));
+          this.pending.delete(m.req);
+          this.rowHandlers.delete(m.req);
+          this.labProgressHandlers.delete(m.req);
+          if (this.labRequest === m.req) this.labRequest = null;
+        }
         this.emit();
         break;
       default: {
-        const cb = this.pending.get((m as { req: number }).req);
-        if (cb) {
-          this.pending.delete((m as { req: number }).req);
-          (cb as (x: unknown) => void)(m);
-        }
+        this.resolvePending((m as { req: number }).req, m);
       }
     }
+  }
+
+  private resolvePending(req: number, message: unknown): void {
+    const pending = this.pending.get(req);
+    if (pending) { this.pending.delete(req); pending.resolve(message); }
+  }
+  private rejectPending(error: Error): void {
+    for (const pending of this.pending.values()) pending.reject(error);
+    this.pending.clear(); this.rowHandlers.clear(); this.labProgressHandlers.clear(); this.labRequest = null;
   }
 
   send(m: ToWorker, transfer: Transferable[] = []): void {
@@ -173,13 +206,16 @@ export class WorldClient {
 
   private request<T>(build: (req: number) => ToWorker): Promise<T> {
     const req = seq++;
-    return new Promise<T>((resolve) => {
-      this.pending.set(req, resolve as Pending);
-      this.send(build(req));
+    return new Promise<T>((resolve, reject) => {
+      this.pending.set(req, { resolve: resolve as (m: unknown) => void, reject });
+      try { this.send(build(req)); }
+      catch (e) { this.pending.delete(req); reject(e instanceof Error ? e : new Error(String(e))); }
     });
   }
 
   init(setup: Partial<WorldSetup>, params: Partial<WorldParams>): void {
+    this.rejectPending(new Error('Świat został zresetowany.'));
+    this.history = null; this.info = null; this.error = null;
     this.initialSetup = setup;
     this.initialParams = params;
     this.frame = null;
@@ -189,6 +225,8 @@ export class WorldClient {
     this.send({ t: 'init', setup, params });
   }
   load(bytes: Uint8Array): void {
+    this.rejectPending(new Error('Świat został przeładowany.'));
+    this.history = null; this.info = null; this.error = null;
     this.send({ t: 'load', bytes }, [bytes.buffer as ArrayBuffer]);
   }
   play(p: boolean): void {
@@ -204,6 +242,10 @@ export class WorldClient {
   }
   command(cmd: Command): void {
     this.send({ t: 'command', cmd });
+  }
+  /** Applies a validated batch between ticks; acknowledgement follows refreshed status. */
+  commands(commands: readonly Command[]): Promise<CommandsMsg> {
+    return this.request(req => ({ t: 'commands', commands, req }));
   }
   select(id: number | null): void {
     this.selectedId = id;
@@ -230,12 +272,13 @@ export class WorldClient {
   /** Test ablacji: wiersze przychodzą na bieżąco (`onRow`), a wynik końcowy w obietnicy. */
   ablation(ticks: number, onRow: (m: AblationRowMsg) => void): Promise<AblationDoneMsg> {
     const req = seq++;
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       this.rowHandlers.set(req, onRow);
-      this.pending.set(req, ((m: AblationDoneMsg) => {
+      this.pending.set(req, { resolve: (value: unknown) => {
+        const m = value as AblationDoneMsg;
         this.rowHandlers.delete(req);
         resolve(m);
-      }) as Pending);
+      }, reject });
       this.send({ t: 'ablation', req, ticks });
     });
   }
@@ -259,7 +302,50 @@ export class WorldClient {
   requestStats(): void {
     this.send({ t: 'sendStats' });
   }
+  atlas(): Promise<AtlasMsg> {
+    return this.request(req => ({ t: 'atlas', req }));
+  }
+  captureSpecimen(id: number, archived = false): Promise<SpecimenMsg> {
+    return this.request(req => ({ t: 'captureSpecimen', id, archived, req }));
+  }
+  lab(request: LabRequest, onProgress: (done: number, total: number) => void): Promise<LabMsg> {
+    if (this.labRequest !== null) return Promise.reject(new Error('Próba laboratoryjna już trwa.'));
+    const req = seq++; this.labRequest = req;
+    this.labProgressHandlers.set(req, onProgress);
+    return new Promise<LabMsg>((resolve, reject) => {
+      this.pending.set(req, { resolve: value => {
+        this.labProgressHandlers.delete(req); this.labRequest = null; resolve(value as LabMsg);
+      }, reject });
+      try { this.send({ t: 'lab', req, request }); }
+      catch (e) {
+        this.pending.delete(req); this.labProgressHandlers.delete(req); this.labRequest = null;
+        reject(e instanceof Error ? e : new Error(String(e)));
+      }
+    });
+  }
+  cancelLab(): void {
+    if (this.labRequest !== null) this.send({ t: 'cancelLab', req: this.labRequest });
+  }
+  historySeek(tick: number): Promise<HistoryMsg> {
+    return this.request(req => ({ t: 'historySeek', tick, req }));
+  }
+  historyLive(): Promise<HistoryMsg> {
+    return this.request(req => ({ t: 'historyLive', req }));
+  }
+  async exportHistory(): Promise<Uint8Array> {
+    const result = await this.request<HistoryBytesMsg>(req => ({ t: 'historyExport', req }));
+    return result.bytes;
+  }
+  async historicalWorldBytes(tick: number): Promise<Uint8Array> {
+    const result = await this.request<HistoryBytesMsg>(req => ({ t: 'historicalWorld', tick, req }));
+    return result.bytes;
+  }
+  loadHistory(bytes: Uint8Array): Promise<HistoryMsg> {
+    this.rejectPending(new Error('Wczytano inne archiwum historii.'));
+    return this.request(req => ({ t: 'loadHistory', bytes, req }));
+  }
   dispose(): void {
+    this.rejectPending(new Error('Świat został zamknięty.'));
     this.worker.terminate();
     this.listeners.clear();
     this.frameListeners.clear();
@@ -339,6 +425,29 @@ export class Manager {
     c.setSpeed(30, '1×');
     this.bump();
     return c;
+  }
+
+  async createFromHistoryBytes(bytes: Uint8Array, name?: string): Promise<WorldClient | null> {
+    let c: WorldClient | null = null;
+    let previousActive: string | null = null;
+    try {
+      if (bytes.byteLength > 160 * 1024 * 1024) throw new Error('Archiwum historii przekracza limit 160 MiB.');
+      const raw = await gunzipHistory(bytes);
+      if (raw.byteLength > 160 * 1024 * 1024) throw new Error('Archiwum historii przekracza limit 160 MiB.');
+      previousActive = this.activeId;
+      c = this.make(name ?? 'Historia (import)');
+      await c.loadHistory(raw);
+      c.setSpeed(30, '1×'); this.bump();
+      return c;
+    } catch (e) {
+      if (c) {
+        const wasActive = this.activeId === c.id;
+        this.remove(c.id);
+        if (wasActive && previousActive && this.worlds.some(w => w.id === previousActive)) this.setActive(previousActive);
+      }
+      this.toast(e instanceof Error ? e.message : String(e));
+      return null;
+    }
   }
 
   /** Bliźniak: ta sama konfiguracja i seed od tick 0 (identyczne warunki początkowe). */
